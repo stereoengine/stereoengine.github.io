@@ -60,7 +60,7 @@
   <!-- Full-screen video background -->
   <div class="hero-video-bg">
     <video playsinline autoplay muted loop>
-          <source src="./static/videos/hero/download-3.mp4" type="video/mp4">
+          <source src="./static/videos/hero/download-4.mp4" type="video/mp4">
     </video>
   </div>
   <div class="hero-overlay"></div>
@@ -88,6 +88,7 @@
         <span class="craft-title-line"><span class="craft-title-accent">StereoEngine</span>: Scaling Stereo Bimanual</span>
         <span class="craft-title-line">Robot Data without Stereo Cameras</span>
       </h1>
+      <p class="craft-anonymous-authors">Anonymous Authors</p>
       <!-- <p class="craft-zero-shot-badge">This website is not completed and we plan to add more videos. We uploaded a <strong>VERY ROUGH</strong> draft so that early reviewers can get a reference to our method. Thank you for spending your time to review our paper. We plan to complete the website by the end of March.</p> -->
       <a href="#why-stereo" class="craft-scroll-indicator">
         <span>SCROLL</span>
@@ -1026,39 +1027,6 @@
   </div>
 </footer>
 
-<!-- Dismissible media load status (bottom-left; avoids overlap with back-to-top) -->
-<div class="craft-toast-notice craft-video-load-toast" id="craft-video-load-toast" role="status" aria-live="polite" aria-atomic="true">
-  <button type="button" class="craft-toast-close" aria-label="Dismiss video status" title="Dismiss">
-    <i class="fas fa-times" aria-hidden="true"></i>
-  </button>
-  <div class="craft-video-load-head">
-    <span class="craft-video-load-icon" aria-hidden="true"><i class="fas fa-film"></i></span>
-    <span class="craft-video-load-title">Page videos</span>
-  </div>
-  <p class="craft-video-load-status" id="craft-video-load-status">Scanning clips…</p>
-  <div class="craft-video-load-bar" aria-hidden="true">
-    <div class="craft-video-load-bar-fill" id="craft-video-load-bar-fill"></div>
-  </div>
-  <div class="craft-video-load-countdown" id="craft-video-load-countdown" hidden>
-    <p class="craft-video-load-countdown-meta">
-      <span class="craft-video-load-countdown-prefix" id="craft-video-load-countdown-prefix">Dismisses in</span>
-      <span class="craft-video-load-countdown-num" id="craft-video-load-count-num">10</span>
-      <span class="craft-video-load-countdown-suffix" id="craft-video-load-countdown-suffix">s</span>
-    </p>
-    <div class="craft-video-load-countdown-track" aria-hidden="true">
-      <div class="craft-video-load-countdown-fill" id="craft-video-load-countdown-fill"></div>
-    </div>
-  </div>
-  <p class="craft-video-load-hint" id="craft-video-load-hint">Media keeps loading in the background as you scroll. You can close this anytime.</p>
-</div>
-
-<!-- <div class="craft-toast-notice" id="craft-toast-notice" role="status" aria-live="polite">
-  <button type="button" class="craft-toast-close" aria-label="Close notice" title="Close">
-    <i class="fas fa-times" aria-hidden="true"></i>
-  </button>
-  <p class="craft-toast-text">This website is not completed and we plan to add more videos. We uploaded a <strong>VERY ROUGH</strong> draft so that early reviewers can get a reference to our paper. We plan to complete the website by the end of March.</p>
-</div> -->
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // iOS/Safari: muted + inline playback must be set reliably for autoplay.
@@ -1102,197 +1070,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-
-  // Dismissible video / media load status (bottom-left)
-  (function initCraftVideoLoadToast() {
-    var AUTO_CLOSE_MS = 10000;
-    var toast = document.getElementById('craft-video-load-toast');
-    var statusEl = document.getElementById('craft-video-load-status');
-    var fillEl = document.getElementById('craft-video-load-bar-fill');
-    var hintEl = document.getElementById('craft-video-load-hint');
-    var countdownEl = document.getElementById('craft-video-load-countdown');
-    var countPrefixEl = document.getElementById('craft-video-load-countdown-prefix');
-    var countNumEl = document.getElementById('craft-video-load-count-num');
-    var countSuffixEl = document.getElementById('craft-video-load-countdown-suffix');
-    var countdownFillEl = document.getElementById('craft-video-load-countdown-fill');
-    if (!toast || !statusEl || !fillEl) return;
-
-    var autoCloseTimer = null;
-    var countdownInterval = null;
-    var autoCloseStarted = false;
-    // Only remember × (manual dismiss). Auto-close after countdown does not set this, so the toast shows again on reload.
-    var SESSION_MANUAL_DISMISS = 'craftVideoToastManualDismiss';
-
-    function clearAutoCloseTimers() {
-      if (autoCloseTimer) {
-        clearTimeout(autoCloseTimer);
-        autoCloseTimer = null;
-      }
-      if (countdownInterval) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-      }
-    }
-
-    if (sessionStorage.getItem(SESSION_MANUAL_DISMISS) === '1') {
-      toast.classList.add('craft-toast-hidden');
-      return;
-    }
-
-    var closeBtn = toast.querySelector('.craft-toast-close');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function() {
-        sessionStorage.setItem(SESSION_MANUAL_DISMISS, '1');
-        clearAutoCloseTimers();
-        toast.classList.add('craft-toast-hidden');
-      });
-    }
-
-    function startAutoClose() {
-      if (autoCloseStarted || !countdownEl || !countPrefixEl || !countNumEl || !countSuffixEl || !countdownFillEl) return;
-      autoCloseStarted = true;
-      countdownEl.hidden = false;
-      toast.classList.add('craft-video-load-toast--autoclose');
-      countNumEl.style.display = '';
-      countSuffixEl.style.display = '';
-      if (hintEl) {
-        hintEl.textContent = 'Tap × anytime to dismiss sooner.';
-      }
-
-      var closeAt = Date.now() + AUTO_CLOSE_MS;
-      function tickCountdown() {
-        var left = Math.max(0, Math.ceil((closeAt - Date.now()) / 1000));
-        if (left <= 0) {
-          countPrefixEl.textContent = 'Closing…';
-          countNumEl.textContent = '';
-          countNumEl.style.display = 'none';
-          countSuffixEl.textContent = '';
-          countSuffixEl.style.display = 'none';
-        } else {
-          countPrefixEl.textContent = 'Dismisses in';
-          countNumEl.style.display = '';
-          countSuffixEl.style.display = '';
-          countNumEl.textContent = String(left);
-          countSuffixEl.textContent = 's';
-        }
-      }
-      tickCountdown();
-
-      countdownFillEl.style.transition = 'none';
-      countdownFillEl.style.width = '100%';
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          void countdownFillEl.offsetWidth;
-          countdownFillEl.style.transition = 'width ' + (AUTO_CLOSE_MS / 1000) + 's linear';
-          countdownFillEl.style.width = '0%';
-        });
-      });
-
-      countdownInterval = setInterval(tickCountdown, 250);
-
-      autoCloseTimer = setTimeout(function() {
-        clearAutoCloseTimers();
-        toast.classList.add('craft-toast-hidden');
-      }, AUTO_CLOSE_MS);
-    }
-
-    function setProgress(loaded, total, failed) {
-      var pct = total > 0 ? Math.min(100, ((loaded + failed) / total) * 100) : 100;
-      fillEl.style.width = pct + '%';
-      if (failed > 0 && loaded + failed >= total) {
-        toast.classList.add('craft-video-load-toast--partial');
-        toast.classList.remove('craft-video-load-toast--done');
-      } else if (total > 0 && loaded + failed >= total) {
-        toast.classList.add('craft-video-load-toast--done');
-        toast.classList.remove('craft-video-load-toast--partial');
-      }
-    }
-
-    function updateLabel(loaded, total, failed, finalized) {
-      if (total === 0) {
-        statusEl.textContent = 'No <video> elements found on this page.';
-        return;
-      }
-      if (!finalized) {
-        statusEl.innerHTML = '<strong>' + loaded + '</strong> of <strong>' + total + '</strong> clips ready to play…' +
-          (failed > 0 ? ' <span class="craft-video-load-warn">(' + failed + ' failed)</span>' : '');
-        return;
-      }
-      if (failed === 0) {
-        statusEl.innerHTML = 'All <strong>' + total + '</strong> clips are ready.';
-      } else {
-        statusEl.innerHTML = '<strong>' + (total - failed) + '</strong> of <strong>' + total + '</strong> clips ready. <span class="craft-video-load-warn">' + failed + ' could not load.</span>';
-      }
-    }
-
-    var videos = Array.prototype.slice.call(document.querySelectorAll('video')).filter(craftVideoHasSource);
-    var total = videos.length;
-
-    if (total === 0) {
-      updateLabel(0, 0, 0, true);
-      setProgress(0, 0, 0);
-      startAutoClose();
-      return;
-    }
-
-    var loaded = 0;
-    var failed = 0;
-    var TOAST_STALL_MS = 12000;
-
-    function tick() {
-      var finalized = loaded + failed >= total;
-      updateLabel(loaded, total, failed, finalized);
-      setProgress(loaded, total, failed);
-      if (finalized && total > 0) {
-        startAutoClose();
-      }
-    }
-
-    statusEl.textContent = 'Loading ' + total + ' clip' + (total === 1 ? '' : 's') + '…';
-    setProgress(0, total, 0);
-
-    var doneFlags = videos.map(function() { return false; });
-    function finishOne(i, ok) {
-      if (doneFlags[i]) return;
-      doneFlags[i] = true;
-      if (ok) loaded++; else failed++;
-      tick();
-    }
-
-    videos.forEach(function(v, i) {
-      function finish(ok) {
-        finishOne(i, ok);
-      }
-      // Hidden-tab clips are deferred on mobile; count them now so the toast never stalls.
-      if (craftVideoIsInHiddenAncestor(v)) {
-        finish(true);
-        return;
-      }
-      if (v.error) {
-        finish(false);
-        return;
-      }
-      // HAVE_METADATA (1) is enough for the bar; hidden-tab clips on mobile often never reach canplay.
-      if (v.readyState >= 1) {
-        finish(true);
-        return;
-      }
-      var onReady = function() { finish(true); };
-      v.addEventListener('loadedmetadata', onReady, { once: true });
-      v.addEventListener('canplay', onReady, { once: true });
-      v.addEventListener('loadeddata', onReady, { once: true });
-      v.addEventListener('error', function() { finish(false); }, { once: true });
-    });
-
-    tick();
-
-    setTimeout(function() {
-      videos.forEach(function(v, i) {
-        if (doneFlags[i]) return;
-        finishOne(i, !v.error);
-      });
-    }, TOAST_STALL_MS);
-  })();
 
   // Scroll-triggered animations
   var animated = document.querySelectorAll('.craft-scroll-animate');
