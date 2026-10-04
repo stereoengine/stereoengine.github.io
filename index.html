@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="StereoEngine: Scaling Stereo Bimanual Robot Data without Stereo Cameras">
+  <meta name="keywords" content="Robotics, Bimanual Manipulation, Video Diffusion, Data Generation">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    StereoEngine: Scaling Stereo Bimanual Robot Data without Stereo Cameras
+  </title>
+  <link rel="icon" href="./static/images/favicon.svg" type="image/svg+xml">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-D1EE48T04E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-D1EE48T04E');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <!-- Font Awesome via CDN (Kit can fail: domain allowlist, blockers, expired token). -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin referrerpolicy="no-referrer" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script src="./static/js/pointcloud-viewer.js" defer></script>
+  <script src="./static/js/rollouts-marquee.js" defer></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<!-- Scroll progress bar (fixed at top) -->
+<div class="craft-scroll-progress" role="presentation" aria-hidden="true">
+  <div class="craft-scroll-progress-bar" id="craft-scroll-progress-bar"></div>
+</div>
+
+<!-- Back to top button (fixed bottom-right) -->
+<a href="#hero" class="craft-back-to-top" id="craft-back-to-top" aria-label="Back to top" title="Back to top">
+  <i class="fas fa-chevron-up"></i>
+</a>
+
+<!-- Hero Section - Robometer-style layout -->
+<section class="hero-craft is-fullheight" id="hero">
+  <!-- Full-screen video background -->
+  <div class="hero-video-bg">
+    <video playsinline autoplay muted loop>
+          <source src="./static/videos/hero/download-3.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="hero-overlay"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="craft-navbar">
+    <div class="craft-navbar-brand">
+      <a href="#hero" class="craft-logo">
+        <span class="craft-logo-text">StereoEngine</span>
+      </a>
+    </div>
+    <nav class="craft-navbar-links">
+      <a href="#why-stereo">Why Stereo?</a>
+      <a href="#stereoengine-l">StereoEngine-L</a>
+      <a href="#stereoengine-s">StereoEngine-S</a>
+      <a href="#results">Results</a>
+      <a href="#successful-rollouts">Real-World Rollouts</a>
+    </nav>
+  </header>
+
+  <!-- Hero Content - Centered on video -->
+  <div class="hero-craft-body">
+    <div class="hero-craft-content">
+      <h1 class="craft-title craft-title-gradient">
+        <span class="craft-title-line"><span class="craft-title-accent">StereoEngine</span>: Scaling Stereo Bimanual</span>
+        <span class="craft-title-line">Robot Data without Stereo Cameras</span>
+      </h1>
+      <!-- <p class="craft-zero-shot-badge">This website is not completed and we plan to add more videos. We uploaded a <strong>VERY ROUGH</strong> draft so that early reviewers can get a reference to our method. Thank you for spending your time to review our paper. We plan to complete the website by the end of March.</p> -->
+      <a href="#why-stereo" class="craft-scroll-indicator">
+        <span>SCROLL</span>
+        <i class="fas fa-chevron-down"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Why Stereo Cameras -->
+<section class="craft-section craft-scroll-animate craft-stereo-section" id="why-stereo">
+  <div class="container is-max-desktop">
+    <div class="craft-stereo-heading">
+      <h2 class="craft-section-title">Why Use Stereo Cameras?</h2>
+    </div>
+
+    <div class="craft-stereo-benefits" aria-label="Two reasons to use stereo cameras">
+      <article class="craft-stereo-benefit">
+        <span class="craft-stereo-benefit-number">1</span>
+        <div>
+          <h3>Better Depth Estimation Compared to Regular Depth Cameras</h3>
+        </div>
+      </article>
+      <article class="craft-stereo-benefit">
+        <span class="craft-stereo-benefit-number">2</span>
+        <div>
+          <h3>Works Better on Transparent and Highly Reflective Objects</h3>
+        </div>
+      </article>
+    </div>
+
+    <div class="craft-pointcloud-comparison" id="stereo-pointcloud-comparison">
+      <div class="craft-pointcloud-heading">
+        <div>
+          <h3>Scene Comparison of Transparent Bottles</h3>
+        </div>
+        <button class="craft-pointcloud-reset" id="craft-pointcloud-reset" type="button" aria-label="Reset point-cloud view">
+          <i class="fas fa-undo" aria-hidden="true"></i>
+          <span>Reset view</span>
+        </button>
+      </div>
+
+      <div class="craft-pointcloud-grid">
+        <article class="craft-pointcloud-card">
+          <div class="craft-pointcloud-label">
+            <span class="craft-pointcloud-dot craft-pointcloud-dot-baseline" aria-hidden="true"></span>
+            <div>
+              <h4>RealSense</h4>
+              <p>Conventional depth camera</p>
+            </div>
+          </div>
+          <div class="craft-pointcloud-stage">
+            <canvas class="craft-pointcloud-canvas" data-cloud="realsense" data-packed="./static/pointclouds/realsense-lite.js" data-ply="./static/pointclouds/raw/realsense.ply" tabindex="0" role="img" aria-label="Interactive RealSense point cloud"></canvas>
+            <button class="craft-pointcloud-activate" type="button" aria-label="Activate RealSense point-cloud controls">
+              <span><i class="fas fa-mouse-pointer" aria-hidden="true"></i> Click to interact</span>
+            </button>
+            <div class="craft-pointcloud-status" role="status" aria-live="polite">
+              <span class="craft-pointcloud-spinner" aria-hidden="true"></span>
+              <span>Preparing point cloud…</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="craft-pointcloud-card craft-pointcloud-card-stereo">
+          <div class="craft-pointcloud-label">
+            <span class="craft-pointcloud-dot craft-pointcloud-dot-stereo" aria-hidden="true"></span>
+            <div>
+              <h4>ZED + FoundationStereo</h4>
+              <p>Stereo reconstruction</p>
+            </div>
+          </div>
+          <div class="craft-pointcloud-stage">
+            <canvas class="craft-pointcloud-canvas" data-cloud="foundationstereo" data-packed="./static/pointclouds/zed-foundationstereo-lite.js" data-ply="./static/pointclouds/raw/zed-foundationstereo.ply" tabindex="0" role="img" aria-label="Interactive ZED and FoundationStereo point cloud"></canvas>
+            <button class="craft-pointcloud-activate" type="button" aria-label="Activate ZED and FoundationStereo point-cloud controls">
+              <span><i class="fas fa-mouse-pointer" aria-hidden="true"></i> Click to interact</span>
+            </button>
+            <div class="craft-pointcloud-status" role="status" aria-live="polite">
+              <span class="craft-pointcloud-spinner" aria-hidden="true"></span>
+              <span>Preparing point cloud…</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="craft-pointcloud-hint" aria-hidden="true">
+        <span><i class="fas fa-mouse-pointer"></i> Click a viewer to activate</span>
+        <span><i class="fas fa-hand-pointer"></i> Then drag to rotate and scroll to zoom</span>
+        <span><i class="fas fa-keyboard"></i> Esc or click outside to release</span>
+      </div>
+      <noscript><p class="craft-pointcloud-noscript">Enable JavaScript to explore the point-cloud comparison.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<!-- Stereo data landscape -->
+<section class="craft-section craft-scroll-animate craft-data-gap-section" id="stereo-data-gap">
+  <div class="container is-max-desktop">
+    <header class="craft-data-gap-heading">
+      <h2 class="craft-section-title">Robot Training Data Is Overwhelmingly Monocular</h2>
+    </header>
+
+    <div class="craft-data-landscape">
+      <article class="craft-data-state craft-data-state-mono">
+        <p class="craft-data-state-label"><span aria-hidden="true"></span> Large Scale Monocular Datasets</p>
+        <div class="craft-dataset-gallery" aria-label="Looping examples from large-scale monocular robot datasets">
+          <figure>
+            <video autoplay muted loop playsinline preload="metadata" poster="./static/images/data-landscape/openx-cloth.jpg">
+              <source src="./static/videos/data-landscape/openx-cloth.mp4" type="video/mp4">
+            </video>
+            <figcaption>Open X-Embodiment</figcaption>
+          </figure>
+          <figure>
+            <video autoplay muted loop playsinline preload="metadata" poster="./static/images/data-landscape/openx-bridge.jpg">
+              <source src="./static/videos/data-landscape/openx-bridge.mp4" type="video/mp4">
+            </video>
+            <figcaption>Open X-Embodiment</figcaption>
+          </figure>
+          <figure>
+            <video autoplay muted loop playsinline preload="metadata" poster="./static/images/data-landscape/bridgedata-knife.jpg">
+              <source src="./static/videos/data-landscape/bridgedata-knife.mp4" type="video/mp4">
+            </video>
+            <figcaption>BridgeData V2</figcaption>
+          </figure>
+          <figure>
+            <video autoplay muted loop playsinline preload="metadata" poster="./static/images/data-landscape/bridgedata-pot.jpg">
+              <source src="./static/videos/data-landscape/bridgedata-pot.mp4" type="video/mp4">
+            </video>
+            <figcaption>BridgeData V2</figcaption>
+          </figure>
+        </div>
+        <div class="craft-data-state-copy">
+          <h3>Mostly single-view RGB</h3>
+        </div>
+        <div class="craft-data-tags" aria-label="Examples of predominantly monocular robot-training datasets">
+          <span>Open X-Embodiment</span>
+          <span>BridgeData V2</span>
+          <span>DROID</span>
+          <span>RoboNet</span>
+        </div>
+      </article>
+
+      <div class="craft-data-shift" aria-hidden="true">
+        <span></span>
+        <i class="fas fa-arrow-right"></i>
+        <span></span>
+      </div>
+
+      <article class="craft-data-state craft-data-state-stereo">
+        <p class="craft-data-state-label"><span aria-hidden="true"></span> StereoEngine</p>
+        <div class="craft-stereoengine-gallery" aria-label="Synchronized StereoEngine left and right RGB views">
+          <figure>
+            <video autoplay muted loop playsinline preload="metadata" poster="./static/images/data-landscape/stereoengine-left.jpg">
+              <source src="./static/videos/data-landscape/stereoengine-left.mp4" type="video/mp4">
+            </video>
+            <figcaption>Left view</figcaption>
+          </figure>
+          <figure>
+            <video autoplay muted loop playsinline preload="metadata" poster="./static/images/data-landscape/stereoengine-right.jpg">
+              <source src="./static/videos/data-landscape/stereoengine-right.mp4" type="video/mp4">
+            </video>
+            <figcaption>Right view</figcaption>
+          </figure>
+        </div>
+        <div class="craft-data-state-copy">
+          <h3>Left and Right View RGB</h3>
+        </div>
+        <div class="craft-data-tags craft-data-tags-stereo">
+          <span>StereoEngine</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Stereo scaling challenge -->
+<section class="craft-stereo-scale-callout craft-scroll-animate" id="stereo-scaling-challenge">
+  <div class="container is-max-desktop">
+    <h2>
+      We need a way to scale stereo dataset by
+      (1) <span>leveraging existing monocular datasets</span> or
+      (2) <span>synthetically generating both views.</span>
+    </h2>
+  </div>
+</section>
+
+<!-- Method carousel temporarily disabled. Kept here for future reuse. -->
+<template id="disabled-method-videos">
+<section class="craft-method-carousel-section craft-scroll-animate" id="method-carousel">
+  <div class="craft-method-carousel-header">
+    <h2 class="craft-section-title craft-section-title-invert">Method Videos</h2>
+    <p class="craft-augmentation-desc craft-augmentation-desc-invert">A quick tour of CRAFT generations across six augmentation axes.</p>
+    <a class="craft-btn craft-btn-paper craft-carousel-cta" href="#umi">Jump to Method</a>
+  </div>
+
+  <div class="craft-carousel" id="craft-method-carousel" data-interval-ms="5000" tabindex="0" aria-label="Method video carousel">
+    <div class="craft-carousel-viewport">
+      <div class="craft-carousel-inner">
+        <div class="craft-carousel-row craft-carousel-row-top" id="craft-carousel-row-top">
+          <!-- Top row: larger cards -->
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/object_pose_generation/stack_two_bowls/stack_two_bowls1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Object pose · Stack bowls</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/lighting_generation/stack_two_bowls/stack_two_bowls1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Lighting · Stack bowls</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/crossembodiment/stack_two_bowls/stack_bowls_two1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Cross-embodiment · Stack bowls</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/object_pose_generation/lift_roller/grab_roller1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Object pose · Lift roller</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/object_pose_generation/place_cans_plasticbox/place_cans_plasticbox1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Object pose · Place cans</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/why_canny/stack_two_bowls.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Canny-edge conditioning</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/stress_testing/beyond_franka/background_generation.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Beyond Franka · Background</div>
+          </div>
+        </div>
+
+        <div class="craft-carousel-row craft-carousel-row-bottom" id="craft-carousel-row-bottom">
+          <!-- Bottom row: slightly smaller cards -->
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/background_generation/stack_two_bowls/stack_bowls_two1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Background · Stack bowls</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/object_color_generation/stack_bowls_two/stack_bowls_two1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Object color · Stack bowls</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/wrist/stack_two_bowls/stack_two_bowls.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Wrist + 3rd · Stack bowls</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/object_color_generation/grab_roller/grab_roller1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Object color · Lift roller</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/background_generation/place_cans_plasticbox/place_cans_plasticbox1.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Background · Place cans</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/stress_testing/object_distractor/object_distractor.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Object distractors</div>
+          </div>
+          <div class="craft-carousel-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/stress_testing/different_reference/reference_image_generation.mp4" type="video/mp4">
+            </video>
+            <div class="craft-carousel-label">Different reference image</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="craft-carousel-controls" aria-label="Carousel controls">
+      <button class="craft-carousel-playpause" type="button" aria-label="Pause carousel">
+        <i class="fas fa-pause" aria-hidden="true"></i>
+        <span class="craft-carousel-playpause-text">Pause</span>
+      </button>
+      <div class="craft-carousel-dots" role="tablist" aria-label="Carousel pages">
+        <button class="craft-carousel-dot is-active" type="button" role="tab" aria-selected="true" aria-label="Position 1"></button>
+        <button class="craft-carousel-dot" type="button" role="tab" aria-selected="false" aria-label="Position 2"></button>
+        <button class="craft-carousel-dot" type="button" role="tab" aria-selected="false" aria-label="Position 3"></button>
+        <button class="craft-carousel-dot" type="button" role="tab" aria-selected="false" aria-label="Position 4"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TL;DR / Overview (inside the Method Videos area) -->
+  <div class="container is-max-desktop craft-tldr-container" id="overview">
+    <div class="craft-tldr-card">
+      <span class="craft-tldr-badge">TL;DR</span>
+      <p class="craft-tldr-lead">
+        <strong>CRAFT</strong> turns just a couple of real robot demonstrations into a large, visually diverse training set by generating photorealistic robot videos with a video diffusion model.
+      </p>
+      <div class="craft-tldr-points">
+        <div class="craft-tldr-point">
+          <div class="craft-tldr-point-icon craft-tldr-point-icon-problem"><i class="fas fa-exclamation"></i></div>
+          <div>
+            <h4>The problem</h4>
+            <p>Real robot data is expensive to collect and lacks visual variation, so policies struggle under new lighting, backgrounds, object positions, or camera views.</p>
+          </div>
+        </div>
+        <div class="craft-tldr-point">
+          <div class="craft-tldr-point-icon craft-tldr-point-icon-idea"><i class="fas fa-lightbulb"></i></div>
+          <div>
+            <h4>The idea</h4>
+            <p>Guide a video diffusion model with canny-edges from simulation to synthesize new, action-labeled demonstrations across six augmentation axes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+</template>
+
+<!-- StereoEngine-L -->
+<section class="craft-section craft-scroll-animate craft-stereoengine-l-section" id="stereoengine-l">
+  <video class="craft-stereoengine-l-background" autoplay muted loop playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+    <source src="./static/videos/stereoengine-l/gallery-background.mp4" type="video/mp4">
+  </video>
+  <div class="craft-stereoengine-l-container">
+    <header class="craft-stereoengine-l-heading">
+      <h2><strong>StereoEngine-L:</strong> Stereo Generation <strong class="craft-l-with-accent">with</strong> a Ground-Truth Left View</h2>
+    </header>
+
+    <div class="craft-l-pipeline" aria-label="StereoEngine-L generation pipeline">
+      <article class="craft-l-stage craft-l-stage-input">
+        <span class="craft-l-step-number" aria-hidden="true">1</span>
+        <div class="craft-l-stage-one-grid">
+          <div class="craft-l-media-card">
+            <div class="craft-l-video-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Ground-truth left video">
+                <source src="./static/videos/stereoengine-l/left-view.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true">
+                <span>Add left video</span>
+              </div>
+            </div>
+            <p>Left Video</p>
+          </div>
+
+          <div class="craft-l-inner-arrow" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-module craft-l-warp-module">
+            <span>Warping<br>Module</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="craft-l-stage-bridge" aria-hidden="true"><span></span></div>
+
+      <article class="craft-l-stage craft-l-stage-generation">
+        <span class="craft-l-step-number" aria-hidden="true">2</span>
+        <div class="craft-l-generation-grid">
+          <div class="craft-l-media-card craft-l-media-card-small craft-l-warped-input">
+            <div class="craft-l-video-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Warped right video">
+                <source src="./static/videos/stereoengine-l/warped-right.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true">
+                <span>Add warped video</span>
+              </div>
+            </div>
+            <p>Warped Right Video</p>
+          </div>
+
+          <div class="craft-l-generation-route craft-l-route-warped" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-language-card">
+            <span>Language Instruction</span>
+          </div>
+
+          <div class="craft-l-generation-route craft-l-route-language" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-media-card craft-l-media-card-small craft-l-masked-input">
+            <div class="craft-l-video-slot craft-l-video-slot-mask">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Disocclusion mask video">
+                <source src="./static/videos/stereoengine-l/disocclusion-mask.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true">
+                <span>Add mask video</span>
+              </div>
+            </div>
+            <p>Masked Right Video</p>
+          </div>
+
+          <div class="craft-l-generation-route craft-l-route-masked" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-module craft-l-diffusion-module">
+            <span>Video<br>Diffusion</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="craft-l-stage-bridge" aria-hidden="true"><span></span></div>
+
+      <article class="craft-l-stage craft-l-stage-output">
+        <span class="craft-l-step-number" aria-hidden="true">3</span>
+        <div class="craft-l-media-card">
+          <div class="craft-l-video-slot">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Generated right video">
+              <source src="./static/videos/stereoengine-l/generated-right.mp4" type="video/mp4">
+            </video>
+            <div class="craft-l-video-placeholder" aria-hidden="true">
+              <span>Add generated video</span>
+            </div>
+          </div>
+          <p>Generated Right Video</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="craft-l-explainer" aria-label="How StereoEngine-L generates a right video">
+      <div class="craft-l-explainer-line" aria-hidden="true"></div>
+
+      <article class="craft-l-explainer-step craft-l-explainer-step-1">
+        <div class="craft-l-explainer-badge" aria-hidden="true">1</div>
+        <div class="craft-l-explainer-copy">
+          <h3>Warping Module</h3>
+          <p>Moves every left pixel to its position in the right view, giving a warped right video and a mask marking the pixels no left pixel could reach.</p>
+        </div>
+      </article>
+
+      <article class="craft-l-explainer-step craft-l-explainer-step-2">
+        <div class="craft-l-explainer-badge" aria-hidden="true">2</div>
+        <div class="craft-l-explainer-copy">
+          <h3>Video Diffusion</h3>
+          <p>Fills the masked region from the warped video, mask, and a language prompt <span class="craft-l-prompt-symbol">ℓ</span>.</p>
+        </div>
+      </article>
+
+      <article class="craft-l-explainer-step craft-l-explainer-step-3">
+        <div class="craft-l-explainer-badge" aria-hidden="true">3</div>
+        <div class="craft-l-explainer-copy">
+          <h3>Stereo Pair</h3>
+          <p>Produces a right video that pairs with the original ground-truth left video.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="craft-l-examples" aria-label="Individual StereoEngine-L data examples">
+      <h3>StereoEngine-L Data Examples</h3>
+      <div class="craft-l-examples-grid">
+        <article class="craft-l-example-pair">
+          <p>Example 1</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 1 left view">
+                <source src="./static/videos/stereoengine-l/examples/example-01-left-native.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 1 right view">
+                <source src="./static/videos/stereoengine-l/examples/example-01-right-native.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+        <article class="craft-l-example-pair">
+          <p>Example 2</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 2 left view">
+                <source src="./static/videos/stereoengine-l/examples/example-02-left-native.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 2 right view">
+                <source src="./static/videos/stereoengine-l/examples/example-02-right-native.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+        <article class="craft-l-example-pair">
+          <p>Example 3</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 3 left view">
+                <source src="./static/videos/stereoengine-l/examples/example-03-left-native.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 3 right view">
+                <source src="./static/videos/stereoengine-l/examples/example-03-right-native.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+        <article class="craft-l-example-pair">
+          <p>Example 4</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 4 left view">
+                <source src="./static/videos/stereoengine-l/examples/example-04-left-native.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 4 right view">
+                <source src="./static/videos/stereoengine-l/examples/example-04-right-native.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+        <article class="craft-l-example-pair">
+          <p>Example 5</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 5 left view">
+                <source src="./static/videos/stereoengine-l/examples/example-05-left-native.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 5 right view">
+                <source src="./static/videos/stereoengine-l/examples/example-05-right-native.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+        <article class="craft-l-example-pair">
+          <p>Example 6</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 6 left view">
+                <source src="./static/videos/stereoengine-l/examples/example-06-left-native.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="StereoEngine-L example 6 right view">
+                <source src="./static/videos/stereoengine-l/examples/example-06-right-native.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Method transition: one known view to fully synthetic stereo -->
+<aside class="craft-method-transition" aria-label="Transition from StereoEngine-L to StereoEngine-S">
+  <div class="craft-method-transition-inner">
+    <span class="craft-method-transition-label craft-method-transition-label-l">StereoEngine-L</span>
+    <div class="craft-method-transition-message">
+      <div class="craft-method-transition-rail" aria-hidden="true"><span></span></div>
+      <p><strong>No ground-truth left view?</strong> StereoEngine also generates both views.</p>
+    </div>
+    <span class="craft-method-transition-label craft-method-transition-label-s">StereoEngine-S</span>
+  </div>
+</aside>
+
+<!-- StereoEngine-S -->
+<section class="craft-section craft-scroll-animate craft-stereoengine-s-section" id="stereoengine-s">
+  <video class="craft-stereoengine-s-background" autoplay muted loop playsinline preload="metadata" aria-hidden="true" tabindex="-1">
+    <source src="./static/videos/stereoengine-s/gallery-background-right.mp4" type="video/mp4">
+  </video>
+
+  <div class="craft-stereoengine-s-container">
+    <header class="craft-stereoengine-s-heading">
+      <h2><strong>StereoEngine-S:</strong> Stereo Generation <strong class="craft-s-without-accent">without</strong> a Ground-Truth Left View</h2>
+    </header>
+
+    <div class="craft-s-pipeline" aria-label="StereoEngine-S generation pipeline">
+      <article class="craft-s-stage craft-s-stage-preprocess">
+        <span class="craft-l-step-number" aria-hidden="true">1</span>
+        <div class="craft-s-preprocess-grid">
+          <div class="craft-l-media-card craft-s-media-card craft-s-sim-left">
+            <div class="craft-l-video-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Left simulation video">
+                <source src="./static/videos/stereoengine-s/simulation-left.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true"><span>Add left simulation</span></div>
+            </div>
+            <p>Left Simulation Video</p>
+          </div>
+
+          <div class="craft-s-route craft-s-route-in-left" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-module craft-s-edge-module">
+            <span>Canny Edge<br>Converter</span>
+          </div>
+
+          <div class="craft-s-route craft-s-route-out-left" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-media-card craft-s-media-card craft-s-canny-left">
+            <div class="craft-l-video-slot craft-s-canny-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Left Canny video">
+                <source src="./static/videos/stereoengine-s/canny-left.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true"><span>Add left Canny</span></div>
+            </div>
+            <p>Left Canny Video</p>
+          </div>
+
+          <div class="craft-l-media-card craft-s-media-card craft-s-sim-right">
+            <div class="craft-l-video-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Right simulation video">
+                <source src="./static/videos/stereoengine-s/simulation-right.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true"><span>Add right simulation</span></div>
+            </div>
+            <p>Right Simulation Video</p>
+          </div>
+
+          <div class="craft-s-route craft-s-route-in-right" aria-hidden="true"><span></span></div>
+          <div class="craft-s-route craft-s-route-out-right" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-media-card craft-s-media-card craft-s-canny-right">
+            <div class="craft-l-video-slot craft-s-canny-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Right Canny video">
+                <source src="./static/videos/stereoengine-s/canny-right.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true"><span>Add right Canny</span></div>
+            </div>
+            <p>Right Canny Video</p>
+          </div>
+        </div>
+      </article>
+
+      <div class="craft-l-stage-bridge" aria-hidden="true"><span></span></div>
+
+      <article class="craft-s-stage craft-s-stage-conditioning">
+        <span class="craft-l-step-number" aria-hidden="true">2</span>
+        <div class="craft-s-conditioning-grid">
+          <div class="craft-s-reference-input">
+            <div class="craft-s-reference-pair">
+              <img class="craft-s-reference-image" src="./static/images/stereoengine-s/reference-pair.png" alt="Left and right reference images">
+            </div>
+            <p>Reference Images</p>
+          </div>
+
+          <div class="craft-s-route craft-s-route-reference" aria-hidden="true"><span></span></div>
+
+          <div class="craft-s-condition-card craft-s-edge-input">
+            <span>Left + Right<br>Canny Videos</span>
+          </div>
+
+          <div class="craft-s-route craft-s-route-edges" aria-hidden="true"><span></span></div>
+
+          <div class="craft-s-condition-card craft-s-language-input">
+            <span>Language Instruction <i>ℓ</i></span>
+          </div>
+
+          <div class="craft-s-route craft-s-route-instruction" aria-hidden="true"><span></span></div>
+
+          <div class="craft-l-module craft-s-diffusion-module">
+            <span>Video<br>Diffusion</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="craft-l-stage-bridge" aria-hidden="true"><span></span></div>
+
+      <article class="craft-s-stage craft-s-stage-output">
+        <span class="craft-l-step-number" aria-hidden="true">3</span>
+        <div class="craft-s-output-stack">
+          <div class="craft-l-media-card craft-s-media-card">
+            <div class="craft-l-video-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Generated left video">
+                <source src="./static/videos/stereoengine-s/generated-left.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true"><span>Add generated left</span></div>
+            </div>
+            <p>Generated Left Video</p>
+          </div>
+
+          <div class="craft-l-media-card craft-s-media-card">
+            <div class="craft-l-video-slot">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Generated right video">
+                <source src="./static/videos/stereoengine-s/generated-right.mp4" type="video/mp4">
+              </video>
+              <div class="craft-l-video-placeholder" aria-hidden="true"><span>Add generated right</span></div>
+            </div>
+            <p>Generated Right Video</p>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="craft-l-explainer craft-s-explainer" aria-label="How StereoEngine-S generates stereo video">
+      <div class="craft-l-explainer-line" aria-hidden="true"></div>
+
+      <article class="craft-l-explainer-step craft-l-explainer-step-1">
+        <div class="craft-l-explainer-badge" aria-hidden="true">1</div>
+        <div class="craft-l-explainer-copy">
+          <h3>Two-Camera Simulation</h3>
+          <p>Render the episode in simulation from two cameras, then convert both views into Canny-edge videos.</p>
+        </div>
+      </article>
+
+      <article class="craft-l-explainer-step craft-l-explainer-step-2">
+        <div class="craft-l-explainer-badge" aria-hidden="true">2</div>
+        <div class="craft-l-explainer-copy">
+          <h3>Geometry + Appearance</h3>
+          <p>Pass both edge videos to the model with two reference images and instruction <span class="craft-l-prompt-symbol">ℓ</span>. Edges define geometry; the references supply background, lighting, and surface texture.</p>
+        </div>
+      </article>
+
+      <article class="craft-l-explainer-step craft-l-explainer-step-3">
+        <div class="craft-l-explainer-badge" aria-hidden="true">3</div>
+        <div class="craft-l-explainer-copy">
+          <h3>Stereo Generation</h3>
+          <p>A video generation model produces the synthetic left and right videos as a stereo pair.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="craft-l-examples craft-s-data-examples" aria-label="StereoEngine-S data examples">
+      <h3>StereoEngine-S Data Examples</h3>
+      <div class="craft-l-examples-grid">
+        <article class="craft-l-example-pair">
+          <p>Stack Two Bowls</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Stack Two Bowls generated left view">
+                <source src="./static/videos/stereoengine-s/examples/stack-two-bowls-left.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Stack Two Bowls generated right view">
+                <source src="./static/videos/stereoengine-s/examples/stack-two-bowls-right.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+
+        <article class="craft-l-example-pair">
+          <p>Lift Two Bottles</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Lift Two Bottles generated left view">
+                <source src="./static/videos/stereoengine-s/examples/lift-two-bottles-left.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Lift Two Bottles generated right view">
+                <source src="./static/videos/stereoengine-s/examples/lift-two-bottles-right.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+
+        <article class="craft-l-example-pair">
+          <p>Container Plate</p>
+          <div class="craft-l-example-views">
+            <div class="craft-l-example-view">
+              <span>Left View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Container Plate generated left view">
+                <source src="./static/videos/stereoengine-s/examples/container-plate-left.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="craft-l-example-view">
+              <span>Right View</span>
+              <video autoplay muted loop playsinline preload="metadata" aria-label="Container Plate generated right view">
+                <source src="./static/videos/stereoengine-s/examples/container-plate-right.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Successful Real-World Rollouts -->
+<section class="craft-section craft-scroll-animate craft-success-rollouts-section" id="successful-rollouts">
+  <div class="craft-success-rollouts-container">
+    <header class="craft-success-rollouts-heading">
+      <h2>Successful Real-World Rollouts</h2>
+    </header>
+
+    <div class="craft-success-rollouts-marquee" tabindex="0" role="region" aria-label="Draggable successful rollout gallery">
+      <div class="craft-success-rollouts-track">
+        <div class="craft-success-rollouts-group">
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Stack Two Bowls successful rollout">
+              <source src="./static/videos/real-world-rollouts/stack-two-bowls-success.mp4" type="video/mp4">
+            </video>
+            <h3>Stack Two Bowls</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Lift Transparent Bottle successful rollout">
+              <source src="./static/videos/real-world-rollouts/lift-transparent-success.mp4" type="video/mp4">
+            </video>
+            <h3>Lift Transparent Bottle</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Place Plate in Container successful rollout">
+              <source src="./static/videos/real-world-rollouts/container-plate-success.mp4" type="video/mp4">
+            </video>
+            <h3>Place Plate in Container</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Close Door successful rollout">
+              <source src="./static/videos/real-world-rollouts/close-door-success.mp4" type="video/mp4">
+            </video>
+            <h3>Close Door</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata" aria-label="Lift Bottles successful rollout">
+              <source src="./static/videos/real-world-rollouts/lift-bottles-pass.mp4" type="video/mp4">
+            </video>
+            <h3>Lift Bottles</h3>
+          </article>
+        </div>
+
+        <div class="craft-success-rollouts-group" aria-hidden="true">
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/real-world-rollouts/stack-two-bowls-success.mp4" type="video/mp4">
+            </video>
+            <h3>Stack Two Bowls</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/real-world-rollouts/lift-transparent-success.mp4" type="video/mp4">
+            </video>
+            <h3>Lift Transparent Bottle</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/real-world-rollouts/container-plate-success.mp4" type="video/mp4">
+            </video>
+            <h3>Place Plate in Container</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/real-world-rollouts/close-door-success.mp4" type="video/mp4">
+            </video>
+            <h3>Close Door</h3>
+          </article>
+
+          <article class="craft-success-rollout-card">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="./static/videos/real-world-rollouts/lift-bottles-pass.mp4" type="video/mp4">
+            </video>
+            <h3>Lift Bottles</h3>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results graphs -->
+<section class="craft-section craft-scroll-animate" id="results">
+  <div class="container is-max-desktop">
+    <h2 class="craft-section-title">Real-World Policy Results</h2>
+    <p class="craft-table-caption">We run each task 20 times on the real robot. StereoEngine-L uses generated stereo data to mid-train ExStereo, while StereoEngine-S uses task-specific generated data to train ExStereo and StereoVLA.</p>
+    <div class="craft-results-color-key" aria-label="Chart color key">
+      <span class="craft-results-key-ours"><i aria-hidden="true"></i><strong>Blue and purple: StereoEngine (Ours)</strong></span>
+      <span class="craft-results-key-baseline"><i aria-hidden="true"></i>Gray, orange, cyan, and pink: baselines</span>
+    </div>
+    <div class="craft-results-tabs">
+      <div class="craft-tab-buttons craft-results-tab-buttons">
+        <button class="craft-tab-btn is-active" data-task="results_stereoengine_l">StereoEngine-L</button>
+        <button class="craft-tab-btn" data-task="results_stereoengine_s">StereoEngine-S</button>
+      </div>
+      <div class="craft-results-panels">
+        <div id="results_stereoengine_l" class="craft-results-panel craft-chart-container">
+          <h4>StereoEngine-L: Left → Right Generation</h4>
+          <div class="chart-wrapper chart-wrapper-large"><canvas id="chart-stereoengine-l"></canvas></div>
+        </div>
+        <div id="results_stereoengine_s" class="craft-results-panel craft-chart-container" style="display:none">
+          <h4>StereoEngine-S: Left + Right Generation</h4>
+          <div class="chart-wrapper chart-wrapper-large"><canvas id="chart-stereoengine-s"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="craft-section craft-scroll-animate craft-section-alt" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="craft-section-title">BibTeX</h2>
+    <div class="craft-bibtex-box">
+      <button type="button" class="craft-bibtex-copy" id="craft-bibtex-copy" aria-label="Copy BibTeX">
+        <i class="far fa-copy" aria-hidden="true"></i>
+        <span class="craft-bibtex-copy-label">Copy</span>
+      </button>
+      <pre id="craft-bibtex-text"></pre>
+    </div>
+  </div>
+</section>
+
+<footer class="footer craft-footer">
+  <div class="container">
+    <div class="craft-footer-inner">
+      <div class="craft-footer-brand">
+        <span class="craft-footer-logo">StereoEngine<span class="craft-footer-logo-dot"></span></span>
+        <p class="craft-footer-title">Scaling Stereo Bimanual Robot Data without Stereo Cameras</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Dismissible media load status (bottom-left; avoids overlap with back-to-top) -->
+<div class="craft-toast-notice craft-video-load-toast" id="craft-video-load-toast" role="status" aria-live="polite" aria-atomic="true">
+  <button type="button" class="craft-toast-close" aria-label="Dismiss video status" title="Dismiss">
+    <i class="fas fa-times" aria-hidden="true"></i>
+  </button>
+  <div class="craft-video-load-head">
+    <span class="craft-video-load-icon" aria-hidden="true"><i class="fas fa-film"></i></span>
+    <span class="craft-video-load-title">Page videos</span>
+  </div>
+  <p class="craft-video-load-status" id="craft-video-load-status">Scanning clips…</p>
+  <div class="craft-video-load-bar" aria-hidden="true">
+    <div class="craft-video-load-bar-fill" id="craft-video-load-bar-fill"></div>
+  </div>
+  <div class="craft-video-load-countdown" id="craft-video-load-countdown" hidden>
+    <p class="craft-video-load-countdown-meta">
+      <span class="craft-video-load-countdown-prefix" id="craft-video-load-countdown-prefix">Dismisses in</span>
+      <span class="craft-video-load-countdown-num" id="craft-video-load-count-num">10</span>
+      <span class="craft-video-load-countdown-suffix" id="craft-video-load-countdown-suffix">s</span>
+    </p>
+    <div class="craft-video-load-countdown-track" aria-hidden="true">
+      <div class="craft-video-load-countdown-fill" id="craft-video-load-countdown-fill"></div>
+    </div>
+  </div>
+  <p class="craft-video-load-hint" id="craft-video-load-hint">Media keeps loading in the background as you scroll. You can close this anytime.</p>
+</div>
+
+<!-- <div class="craft-toast-notice" id="craft-toast-notice" role="status" aria-live="polite">
+  <button type="button" class="craft-toast-close" aria-label="Close notice" title="Close">
+    <i class="fas fa-times" aria-hidden="true"></i>
+  </button>
+  <p class="craft-toast-text">This website is not completed and we plan to add more videos. We uploaded a <strong>VERY ROUGH</strong> draft so that early reviewers can get a reference to our paper. We plan to complete the website by the end of March.</p>
+</div> -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // iOS/Safari: muted + inline playback must be set reliably for autoplay.
+  document.querySelectorAll('video').forEach(function(v) {
+    v.muted = true;
+    v.defaultMuted = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+  });
+
+  function craftVideoIsInHiddenAncestor(el) {
+    var n = el;
+    while (n && n !== document.body) {
+      try {
+        var st = window.getComputedStyle(n);
+        if (st.display === 'none' || st.visibility === 'hidden') return true;
+      } catch (e) {}
+      n = n.parentElement;
+    }
+    return false;
+  }
+
+  function craftVideoHasSource(video) {
+    return Boolean(video.currentSrc || video.getAttribute('src') || video.querySelector('source[src]'));
+  }
+
+  function craftNudgeVideosPlayIn(container) {
+    if (!container) return;
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        container.querySelectorAll('video').forEach(function(v) {
+          if (!craftVideoHasSource(v)) return;
+          v.muted = true;
+          v.playsInline = true;
+          // Safari on mobile sometimes needs an explicit load() after display:none -> block.
+          try { v.load(); } catch (e) {}
+          var p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(function() {});
+        });
+      });
+    });
+  }
+
+  // Dismissible video / media load status (bottom-left)
+  (function initCraftVideoLoadToast() {
+    var AUTO_CLOSE_MS = 10000;
+    var toast = document.getElementById('craft-video-load-toast');
+    var statusEl = document.getElementById('craft-video-load-status');
+    var fillEl = document.getElementById('craft-video-load-bar-fill');
+    var hintEl = document.getElementById('craft-video-load-hint');
+    var countdownEl = document.getElementById('craft-video-load-countdown');
+    var countPrefixEl = document.getElementById('craft-video-load-countdown-prefix');
+    var countNumEl = document.getElementById('craft-video-load-count-num');
+    var countSuffixEl = document.getElementById('craft-video-load-countdown-suffix');
+    var countdownFillEl = document.getElementById('craft-video-load-countdown-fill');
+    if (!toast || !statusEl || !fillEl) return;
+
+    var autoCloseTimer = null;
+    var countdownInterval = null;
+    var autoCloseStarted = false;
+    // Only remember × (manual dismiss). Auto-close after countdown does not set this, so the toast shows again on reload.
+    var SESSION_MANUAL_DISMISS = 'craftVideoToastManualDismiss';
+
+    function clearAutoCloseTimers() {
+      if (autoCloseTimer) {
+        clearTimeout(autoCloseTimer);
+        autoCloseTimer = null;
+      }
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
+
+    if (sessionStorage.getItem(SESSION_MANUAL_DISMISS) === '1') {
+      toast.classList.add('craft-toast-hidden');
+      return;
+    }
+
+    var closeBtn = toast.querySelector('.craft-toast-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function() {
+        sessionStorage.setItem(SESSION_MANUAL_DISMISS, '1');
+        clearAutoCloseTimers();
+        toast.classList.add('craft-toast-hidden');
+      });
+    }
+
+    function startAutoClose() {
+      if (autoCloseStarted || !countdownEl || !countPrefixEl || !countNumEl || !countSuffixEl || !countdownFillEl) return;
+      autoCloseStarted = true;
+      countdownEl.hidden = false;
+      toast.classList.add('craft-video-load-toast--autoclose');
+      countNumEl.style.display = '';
+      countSuffixEl.style.display = '';
+      if (hintEl) {
+        hintEl.textContent = 'Tap × anytime to dismiss sooner.';
+      }
+
+      var closeAt = Date.now() + AUTO_CLOSE_MS;
+      function tickCountdown() {
+        var left = Math.max(0, Math.ceil((closeAt - Date.now()) / 1000));
+        if (left <= 0) {
+          countPrefixEl.textContent = 'Closing…';
+          countNumEl.textContent = '';
+          countNumEl.style.display = 'none';
+          countSuffixEl.textContent = '';
+          countSuffixEl.style.display = 'none';
+        } else {
+          countPrefixEl.textContent = 'Dismisses in';
+          countNumEl.style.display = '';
+          countSuffixEl.style.display = '';
+          countNumEl.textContent = String(left);
+          countSuffixEl.textContent = 's';
+        }
+      }
+      tickCountdown();
+
+      countdownFillEl.style.transition = 'none';
+      countdownFillEl.style.width = '100%';
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          void countdownFillEl.offsetWidth;
+          countdownFillEl.style.transition = 'width ' + (AUTO_CLOSE_MS / 1000) + 's linear';
+          countdownFillEl.style.width = '0%';
+        });
+      });
+
+      countdownInterval = setInterval(tickCountdown, 250);
+
+      autoCloseTimer = setTimeout(function() {
+        clearAutoCloseTimers();
+        toast.classList.add('craft-toast-hidden');
+      }, AUTO_CLOSE_MS);
+    }
+
+    function setProgress(loaded, total, failed) {
+      var pct = total > 0 ? Math.min(100, ((loaded + failed) / total) * 100) : 100;
+      fillEl.style.width = pct + '%';
+      if (failed > 0 && loaded + failed >= total) {
+        toast.classList.add('craft-video-load-toast--partial');
+        toast.classList.remove('craft-video-load-toast--done');
+      } else if (total > 0 && loaded + failed >= total) {
+        toast.classList.add('craft-video-load-toast--done');
+        toast.classList.remove('craft-video-load-toast--partial');
+      }
+    }
+
+    function updateLabel(loaded, total, failed, finalized) {
+      if (total === 0) {
+        statusEl.textContent = 'No <video> elements found on this page.';
+        return;
+      }
+      if (!finalized) {
+        statusEl.innerHTML = '<strong>' + loaded + '</strong> of <strong>' + total + '</strong> clips ready to play…' +
+          (failed > 0 ? ' <span class="craft-video-load-warn">(' + failed + ' failed)</span>' : '');
+        return;
+      }
+      if (failed === 0) {
+        statusEl.innerHTML = 'All <strong>' + total + '</strong> clips are ready.';
+      } else {
+        statusEl.innerHTML = '<strong>' + (total - failed) + '</strong> of <strong>' + total + '</strong> clips ready. <span class="craft-video-load-warn">' + failed + ' could not load.</span>';
+      }
+    }
+
+    var videos = Array.prototype.slice.call(document.querySelectorAll('video')).filter(craftVideoHasSource);
+    var total = videos.length;
+
+    if (total === 0) {
+      updateLabel(0, 0, 0, true);
+      setProgress(0, 0, 0);
+      startAutoClose();
+      return;
+    }
+
+    var loaded = 0;
+    var failed = 0;
+    var TOAST_STALL_MS = 12000;
+
+    function tick() {
+      var finalized = loaded + failed >= total;
+      updateLabel(loaded, total, failed, finalized);
+      setProgress(loaded, total, failed);
+      if (finalized && total > 0) {
+        startAutoClose();
+      }
+    }
+
+    statusEl.textContent = 'Loading ' + total + ' clip' + (total === 1 ? '' : 's') + '…';
+    setProgress(0, total, 0);
+
+    var doneFlags = videos.map(function() { return false; });
+    function finishOne(i, ok) {
+      if (doneFlags[i]) return;
+      doneFlags[i] = true;
+      if (ok) loaded++; else failed++;
+      tick();
+    }
+
+    videos.forEach(function(v, i) {
+      function finish(ok) {
+        finishOne(i, ok);
+      }
+      // Hidden-tab clips are deferred on mobile; count them now so the toast never stalls.
+      if (craftVideoIsInHiddenAncestor(v)) {
+        finish(true);
+        return;
+      }
+      if (v.error) {
+        finish(false);
+        return;
+      }
+      // HAVE_METADATA (1) is enough for the bar; hidden-tab clips on mobile often never reach canplay.
+      if (v.readyState >= 1) {
+        finish(true);
+        return;
+      }
+      var onReady = function() { finish(true); };
+      v.addEventListener('loadedmetadata', onReady, { once: true });
+      v.addEventListener('canplay', onReady, { once: true });
+      v.addEventListener('loadeddata', onReady, { once: true });
+      v.addEventListener('error', function() { finish(false); }, { once: true });
+    });
+
+    tick();
+
+    setTimeout(function() {
+      videos.forEach(function(v, i) {
+        if (doneFlags[i]) return;
+        finishOne(i, !v.error);
+      });
+    }, TOAST_STALL_MS);
+  })();
+
+  // Scroll-triggered animations
+  var animated = document.querySelectorAll('.craft-scroll-animate');
+  if (animated.length && 'IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('craft-visible');
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+    animated.forEach(function(el) { observer.observe(el); });
+  } else {
+    animated.forEach(function(el) { el.classList.add('craft-visible'); });
+  }
+
+  // Scroll: one rAF-coalesced tick (avoids 3× layout reads per scroll event)
+  var progressBar = document.getElementById('craft-scroll-progress-bar');
+  var navbar = document.querySelector('.craft-navbar');
+  var hero = document.getElementById('hero');
+  var backToTop = document.getElementById('craft-back-to-top');
+  function updateScrollProgress() {
+    if (!progressBar) return;
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = scrollHeight > 0 ? Math.min(100, (scrollTop / scrollHeight) * 100) : 0;
+    progressBar.style.width = pct + '%';
+  }
+  function updateNavbarStyle() {
+    if (!navbar) return;
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    var threshold = hero ? Math.max(80, hero.offsetHeight - 120) : 80;
+    navbar.classList.toggle('craft-navbar-scrolled', y >= threshold);
+  }
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    var y = window.scrollY || document.documentElement.scrollTop;
+    backToTop.classList.toggle('craft-back-to-top-visible', y > 400);
+  }
+  var scrollRafPending = false;
+  function onScrollUnified() {
+    if (scrollRafPending) return;
+    scrollRafPending = true;
+    requestAnimationFrame(function() {
+      scrollRafPending = false;
+      updateScrollProgress();
+      updateNavbarStyle();
+      toggleBackToTop();
+    });
+  }
+  window.addEventListener('scroll', onScrollUnified, { passive: true });
+  window.addEventListener('resize', function() {
+    updateNavbarStyle();
+    updateScrollProgress();
+    toggleBackToTop();
+  });
+  updateScrollProgress();
+  updateNavbarStyle();
+  toggleBackToTop();
+  if (backToTop) {
+    backToTop.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('hero') && document.getElementById('hero').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  // Copy BibTeX to clipboard
+  (function setupBibtexCopy() {
+    var btn = document.getElementById('craft-bibtex-copy');
+    var pre = document.getElementById('craft-bibtex-text');
+    if (!btn || !pre) return;
+    var labelEl = btn.querySelector('.craft-bibtex-copy-label');
+    var iconEl = btn.querySelector('i');
+    var resetTimer;
+    function showCopied(ok) {
+      btn.classList.add('is-copied');
+      if (labelEl) labelEl.textContent = ok ? 'Copied!' : 'Press ⌘C';
+      if (iconEl) iconEl.className = ok ? 'fas fa-check' : 'far fa-copy';
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function() {
+        btn.classList.remove('is-copied');
+        if (labelEl) labelEl.textContent = 'Copy';
+        if (iconEl) iconEl.className = 'far fa-copy';
+      }, 2000);
+    }
+    btn.addEventListener('click', function() {
+      var text = pre.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() { showCopied(true); }, function() { fallbackCopy(text); });
+      } else {
+        fallbackCopy(text);
+      }
+    });
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'absolute';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      showCopied(ok);
+    }
+  })();
+
+  // Below-hero videos: pause when off-screen. Do not pause clips inside display:none tabs - that
+  // blocks loading on iOS and leaves the load toast stuck.
+  (function setupViewportBoundVideos() {
+    if (!('IntersectionObserver' in window)) return;
+    var videos = Array.prototype.slice.call(document.querySelectorAll('video')).filter(craftVideoHasSource);
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var v = entry.target;
+        if (!(v instanceof HTMLVideoElement)) return;
+        if (entry.isIntersecting && v.hasAttribute('autoplay')) {
+          var p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(function() {});
+        } else if (!craftVideoIsInHiddenAncestor(v)) {
+          v.pause();
+        }
+      });
+    }, { root: null, rootMargin: '160px 0px 160px 0px', threshold: 0.01 });
+    videos.forEach(function(v) {
+      if (hero && hero.contains(v)) {
+        return;
+      }
+      if (!craftVideoIsInHiddenAncestor(v)) {
+        v.pause();
+      }
+      io.observe(v);
+    });
+  })();
+
+  // Tab buttons for Object Pose (and other augmentation sections)
+  document.querySelectorAll('.craft-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const task = this.dataset.task;
+      const container = this.closest('.craft-video-tabs') || this.closest('.craft-rollout-tabs') || this.closest('.craft-stress-tabs') || this.closest('.craft-results-tabs');
+      if (!container) return;
+      container.querySelectorAll('.craft-tab-btn').forEach(b => b.classList.remove('is-active'));
+      this.classList.add('is-active');
+      if (task.startsWith('rollout_')) {
+        container.querySelectorAll('.craft-rollout-panel').forEach(p => { p.style.display = 'none'; });
+        const target = document.getElementById(task);
+        if (target) {
+          target.style.display = 'block';
+          craftNudgeVideosPlayIn(target);
+        }
+      } else if (task.startsWith('stress_')) {
+        container.querySelectorAll('.craft-stress-panel').forEach(p => { p.style.display = 'none'; });
+        const target = document.getElementById(task);
+        if (target) {
+          target.style.display = 'block';
+          craftNudgeVideosPlayIn(target);
+        }
+      } else if (task.startsWith('results_')) {
+        container.querySelectorAll('.craft-results-panel').forEach(p => { p.style.display = 'none'; });
+        const target = document.getElementById(task);
+        if (target && window.craftResultsChartConfigs) {
+          target.style.display = 'block';
+          var canvas = target.querySelector('canvas');
+          if (canvas && canvas.id && window.craftResultsChartConfigs[canvas.id]) {
+            try {
+              var ch = typeof Chart !== 'undefined' && Chart.getChart ? Chart.getChart(canvas) : null;
+              if (ch) ch.destroy();
+              new Chart(canvas, window.craftResultsChartConfigs[canvas.id]);
+            } catch (e) {}
+          }
+          craftNudgeVideosPlayIn(target);
+        }
+      } else {
+        container.querySelectorAll('.craft-task-videos').forEach(v => { v.style.display = 'none'; });
+        const target = document.getElementById(task);
+        if (target) {
+          target.style.display = 'grid';
+          target.style.gap = '1.5rem';
+          craftNudgeVideosPlayIn(target);
+        }
+      }
+    });
+  });
+
+  var chartFontFamily = "'Noto Sans', 'Google Sans', system-ui, sans-serif";
+  if (typeof Chart !== 'undefined') {
+    Chart.defaults.font.family = chartFontFamily;
+    Chart.defaults.color = '#475569';
+  }
+
+  // Vertical gradient fill for bars (lighter top -> saturated bottom).
+  // Scriptable so it can build a canvas gradient once the chart area exists.
+  function barGradient(top, bottom) {
+    return function(context) {
+      var chart = context.chart;
+      var ctx = chart.ctx;
+      var area = chart.chartArea;
+      if (!area) return bottom; // first paint, before layout
+      var g = ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      g.addColorStop(0, top);
+      g.addColorStop(1, bottom);
+      return g;
+    };
+  }
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 900, easing: 'easeOutQuart' },
+    layout: { padding: { top: 20, right: 24, bottom: 8, left: 8 } },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        onClick: function() {}, // disable click-to-toggle datasets
+        labels: {
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          font: { size: 12, weight: '600' },
+          color: '#334155',
+          generateLabels: function(chart) {
+            return chart.data.datasets.map(function(ds, i) {
+              var meta = chart.getDatasetMeta(i);
+              return {
+                text: ds.label,
+                fillStyle: ds._swatch || ds.backgroundColor,
+                strokeStyle: ds._swatch || ds.backgroundColor,
+                lineWidth: 0,
+                pointStyle: 'circle',
+                hidden: !chart.isDatasetVisible(i),
+                datasetIndex: i
+              };
+            });
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        titleColor: '#f8fafc',
+        bodyColor: '#e2e8f0',
+        padding: 12,
+        cornerRadius: 10,
+        boxPadding: 6,
+        usePointStyle: true,
+        titleFont: { size: 13, weight: '700' },
+        bodyFont: { size: 12 },
+          displayColors: true,
+          callbacks: {
+          label: function(ctx) {
+            var pct = ctx.parsed.y;
+            return '  ' + ctx.dataset.label + ': ' + pct + '% (' + (pct / 5) + '/20)';
+          },
+          labelColor: function(ctx) {
+            var sw = ctx.dataset._swatch || 'rgba(99,102,241,1)';
+            return { borderColor: sw, backgroundColor: sw, borderRadius: 4 };
+          }
+        }
+      }
+    },
+    elements: {
+      bar: { borderRadius: 8, borderSkipped: false }
+    },
+    scales: {
+      x: {
+        grid: { display: false, drawBorder: false },
+        border: { display: false },
+        ticks: {
+          maxRotation: 0, minRotation: 0, autoSkip: false,
+          font: { size: 12, weight: '600' }, padding: 10, color: '#475569',
+          // Keep labels horizontal: wrap long task names onto multiple lines instead of rotating.
+          callback: function(value) {
+            var label = this.getLabelForValue(value);
+            if (label.length <= 14) return label;
+            var words = label.split(' ');
+            var lines = [];
+            var cur = '';
+            words.forEach(function(w) {
+              if ((cur + ' ' + w).trim().length > 14) { if (cur) lines.push(cur); cur = w; }
+              else { cur = (cur ? cur + ' ' : '') + w; }
+            });
+            if (cur) lines.push(cur);
+            return lines;
+          }
+        },
+        barPercentage: 0.78,
+        categoryPercentage: 0.82
+      },
+      y: {
+        min: 0,
+        max: 100,
+        grid: { color: 'rgba(148, 163, 184, 0.18)', drawBorder: false, lineWidth: 1 },
+        border: { display: false, dash: [4, 4] },
+        title: { display: true, text: 'Success Rate (%)', font: { size: 12, weight: '600' }, color: '#475569' },
+        ticks: { padding: 10, font: { size: 11 }, color: '#94a3b8', callback: function(v) { return v + '%'; } }
+      }
+    }
+  };
+  const stereoEngineLLabels = ['Stack Two Bowls', 'Lift Transparent Bottles', 'Close Door'];
+  const stereoEngineSLabels = ['Stack Two Bowls', 'Lift Two Bottles', 'Container Plate'];
+  // Each entry: gradient top/bottom + matching legend swatch color.
+  const colors = {
+    neutral:          { top: 'rgba(241, 245, 249, 0.96)', bottom: 'rgba(203, 213, 225, 0.98)', swatch: 'rgb(203, 213, 225)' },
+    svg:              { top: 'rgba(255, 247, 237, 0.98)', bottom: 'rgba(254, 215, 170, 1)',    swatch: 'rgb(253, 186, 116)' },
+    stereoCrafter:    { top: 'rgba(236, 254, 255, 0.98)', bottom: 'rgba(165, 243, 252, 1)',    swatch: 'rgb(103, 232, 249)' },
+    stereoEngine:     { top: 'rgba(96, 165, 250, 0.98)',  bottom: 'rgba(37, 99, 235, 1)',      swatch: 'rgb(37, 99, 235)' },
+    stereoVlaPoint:   { top: 'rgba(253, 242, 248, 0.98)', bottom: 'rgba(251, 207, 232, 1)',    swatch: 'rgb(249, 168, 212)' },
+    stereoVlaEngine:  { top: 'rgba(196, 181, 253, 0.98)', bottom: 'rgba(124, 58, 237, 1)',     swatch: 'rgb(124, 58, 237)' }
+  };
+
+  function makeDataset(label, data, colorKey) {
+    const c = colors[colorKey];
+    return {
+      label, data,
+      backgroundColor: barGradient(c.top, c.bottom),
+      hoverBackgroundColor: barGradient(c.top, c.bottom),
+      borderWidth: 0,
+      borderRadius: 8,
+      borderSkipped: false,
+      maxBarThickness: 54,
+      pointStyle: 'circle',
+      _swatch: c.swatch
+    };
+  }
+
+  window.craftResultsChartConfigs = {
+    'chart-stereoengine-l': {
+      type: 'bar',
+      data: {
+        labels: stereoEngineLLabels,
+        datasets: [
+          makeDataset('No Mid-Training', [45, 55, 80], 'neutral'),
+          makeDataset('SVG', [35, 50, 70], 'svg'),
+          makeDataset('StereoCrafter', [50, 65, 85], 'stereoCrafter'),
+          makeDataset('StereoEngine (Ours)', [65, 90, 95], 'stereoEngine')
+        ]
+      },
+      options: chartOptions
+    },
+    'chart-stereoengine-s': {
+      type: 'bar',
+      data: {
+        labels: stereoEngineSLabels,
+        datasets: [
+          makeDataset('ExStereo · Point Clouds', [0, 0, 0], 'neutral'),
+          makeDataset('ExStereo · StereoEngine (Ours)', [55, 65, 75], 'stereoEngine'),
+          makeDataset('StereoVLA · Point Clouds', [0, 0, 0], 'stereoVlaPoint'),
+          makeDataset('StereoVLA · StereoEngine (Ours)', [35, 45, 55], 'stereoVlaEngine')
+        ]
+      },
+      options: chartOptions
+    }
+  };
+
+  var initialResultsCanvas = document.getElementById('chart-stereoengine-l');
+  if (initialResultsCanvas && window.craftResultsChartConfigs['chart-stereoengine-l']) {
+    new Chart(initialResultsCanvas, window.craftResultsChartConfigs['chart-stereoengine-l']);
+  }
+});
+</script>
+
+</body>
+
+</html>

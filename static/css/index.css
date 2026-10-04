@@ -1,0 +1,5119 @@
+html {
+  scroll-behavior: smooth;
+  /* Keep anchored section headings clear of the fixed navbar */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  background: radial-gradient(900px 420px at 50% 0%, rgba(59, 130, 246, 0.07), rgba(255, 255, 255, 0) 60%),
+              linear-gradient(180deg, #ffffff 0%, #f4f7ff 55%, #ffffff 100%);
+}
+
+::selection {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+/* Scroll-triggered animations */
+.craft-scroll-animate {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.craft-scroll-animate.craft-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children when parent section is visible */
+.craft-scroll-animate .craft-contributions.craft-stagger-children .craft-contribution-card,
+.craft-scroll-animate .craft-method-steps.craft-stagger-children .craft-method-box,
+.craft-scroll-animate .craft-setup-cards.craft-stagger-children .craft-setup-card,
+.craft-scroll-animate .craft-task-cards.craft-stagger-children .craft-task-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+}
+
+.craft-scroll-animate.craft-visible .craft-contributions.craft-stagger-children .craft-contribution-card,
+.craft-scroll-animate.craft-visible .craft-method-steps.craft-stagger-children .craft-method-box,
+.craft-scroll-animate.craft-visible .craft-setup-cards.craft-stagger-children .craft-setup-card,
+.craft-scroll-animate.craft-visible .craft-task-cards.craft-stagger-children .craft-task-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.craft-scroll-animate.craft-visible .craft-contributions.craft-stagger-children .craft-contribution-card:nth-child(1),
+.craft-scroll-animate.craft-visible .craft-method-steps.craft-stagger-children .craft-method-box:nth-child(1),
+.craft-scroll-animate.craft-visible .craft-setup-cards.craft-stagger-children .craft-setup-card:nth-child(1),
+.craft-scroll-animate.craft-visible .craft-task-cards.craft-stagger-children .craft-task-card:nth-child(1) { transition-delay: 0.06s; }
+.craft-scroll-animate.craft-visible .craft-contributions.craft-stagger-children .craft-contribution-card:nth-child(2),
+.craft-scroll-animate.craft-visible .craft-method-steps.craft-stagger-children .craft-method-box:nth-child(2),
+.craft-scroll-animate.craft-visible .craft-setup-cards.craft-stagger-children .craft-setup-card:nth-child(2),
+.craft-scroll-animate.craft-visible .craft-task-cards.craft-stagger-children .craft-task-card:nth-child(2) { transition-delay: 0.14s; }
+.craft-scroll-animate.craft-visible .craft-contributions.craft-stagger-children .craft-contribution-card:nth-child(3),
+.craft-scroll-animate.craft-visible .craft-method-steps.craft-stagger-children .craft-method-box:nth-child(3),
+.craft-scroll-animate.craft-visible .craft-setup-cards.craft-stagger-children .craft-setup-card:nth-child(3),
+.craft-scroll-animate.craft-visible .craft-task-cards.craft-stagger-children .craft-task-card:nth-child(3) { transition-delay: 0.22s; }
+.craft-scroll-animate.craft-visible .craft-contributions.craft-stagger-children .craft-contribution-card:nth-child(4),
+.craft-scroll-animate.craft-visible .craft-method-steps.craft-stagger-children .craft-method-box:nth-child(4),
+.craft-scroll-animate.craft-visible .craft-setup-cards.craft-stagger-children .craft-setup-card:nth-child(4),
+.craft-scroll-animate.craft-visible .craft-task-cards.craft-stagger-children .craft-task-card:nth-child(4) { transition-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .craft-scroll-animate,
+  .craft-scroll-animate.craft-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .craft-scroll-animate .craft-contributions.craft-stagger-children .craft-contribution-card,
+  .craft-scroll-animate .craft-method-steps.craft-stagger-children .craft-method-box,
+  .craft-scroll-animate .craft-setup-cards.craft-stagger-children .craft-setup-card,
+  .craft-scroll-animate .craft-task-cards.craft-stagger-children .craft-task-card,
+  .craft-scroll-animate.craft-visible .craft-contributions.craft-stagger-children .craft-contribution-card,
+  .craft-scroll-animate.craft-visible .craft-method-steps.craft-stagger-children .craft-method-box,
+  .craft-scroll-animate.craft-visible .craft-setup-cards.craft-stagger-children .craft-setup-card,
+  .craft-scroll-animate.craft-visible .craft-task-cards.craft-stagger-children .craft-task-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Scroll progress bar at top of viewport */
+.craft-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.craft-scroll-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #2d7dd2;
+  transition: width 0.08s ease-out;
+}
+
+/* Dismissible toast notice (bottom-right) */
+.craft-toast-notice {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9998;
+  max-width: 360px;
+  padding: 1rem 1.25rem 1rem 1rem;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(148, 163, 184, 0.12);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #334155;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.craft-toast-notice.craft-toast-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(1rem);
+  pointer-events: none;
+}
+
+.craft-toast-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.craft-toast-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.craft-toast-close:focus {
+  outline: 2px solid #2d7dd2;
+  outline-offset: 2px;
+}
+
+.craft-toast-close i {
+  font-size: 0.9rem;
+}
+
+.craft-toast-text {
+  margin: 0;
+  padding-right: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #475569;
+}
+
+/* Video / media load status toast — bottom-left to avoid back-to-top overlap */
+.craft-toast-notice.craft-video-load-toast {
+  left: 1.5rem;
+  right: auto;
+  bottom: 1.5rem;
+  max-width: 348px;
+  padding: 1.1rem 2.85rem 1rem 1.15rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(165deg, #ffffff 0%, #f8fafc 100%);
+  animation: craft-video-load-toast-in 0.45s ease-out;
+}
+
+@keyframes craft-video-load-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.craft-video-load-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.45rem;
+}
+
+.craft-video-load-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #e0f2fe 0%, #dbeafe 100%);
+  color: #2d7dd2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.craft-video-load-title {
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1e293b;
+}
+
+.craft-video-load-status {
+  margin: 0 0 0.65rem;
+  padding-right: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.craft-video-load-status strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.craft-video-load-warn {
+  color: #b45309;
+  font-weight: 500;
+}
+
+.craft-video-load-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow:hidden;
+  margin-bottom: 0.55rem;
+}
+
+.craft-video-load-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2d7dd2, #38bdf8);
+  transition: width 0.4s ease;
+}
+
+.craft-video-load-toast.craft-video-load-toast--done .craft-video-load-bar-fill {
+  background: linear-gradient(90deg, #059669, #34d399);
+}
+
+.craft-video-load-toast.craft-video-load-toast--partial .craft-video-load-bar-fill {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.craft-video-load-hint {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #94a3b8;
+}
+
+/* Compact auto-dismiss countdown — same card, no nested panel */
+.craft-video-load-countdown {
+  margin: 0.3rem 0 0.2rem;
+  padding: 0;
+}
+
+.craft-video-load-countdown-meta {
+  margin: 0 0 0.28rem;
+  padding-right: 0.25rem;
+  font-size: 0.68rem;
+  line-height: 1.3;
+  color: #94a3b8;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.12rem 0.28rem;
+}
+
+.craft-video-load-countdown-prefix {
+  letter-spacing: 0.01em;
+}
+
+.craft-video-load-countdown-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #64748b;
+  min-width: 1ch;
+}
+
+.craft-video-load-countdown-suffix {
+  font-weight: 600;
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.craft-video-load-countdown-track {
+  height: 3px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.craft-video-load-countdown-fill {
+  height: 100%;
+  width: 100%;
+  display: block;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.craft-video-load-toast.craft-video-load-toast--done .craft-video-load-countdown-fill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.craft-video-load-toast.craft-video-load-toast--partial .craft-video-load-countdown-fill {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.craft-video-load-toast--autoclose .craft-video-load-hint {
+  margin-top: 0.08rem;
+}
+
+@media (max-width: 480px) {
+  .craft-toast-notice {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    max-width: none;
+  }
+
+  .craft-toast-notice.craft-video-load-toast {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    max-width: none;
+  }
+}
+
+/* Back to top button (fixed bottom-right) */
+.craft-back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #2d7dd2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(45, 125, 210, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease, background 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: none;
+  text-decoration: none;
+}
+
+.craft-back-to-top.craft-back-to-top-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.craft-back-to-top:hover {
+  background: #1d6bb8;
+  box-shadow: 0 6px 20px rgba(45, 125, 210, 0.5);
+  color: white;
+}
+
+.craft-back-to-top:active {
+  transform: scale(0.96);
+}
+
+.craft-back-to-top i {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .craft-back-to-top {
+    bottom: 1.5rem;
+    right: 1.25rem;
+    width: 44px;
+    height: 44px;
+  }
+  .craft-back-to-top i {
+    font-size: 1rem;
+  }
+}
+
+/* ===== CRAFT Robometer-style Hero Section ===== */
+.hero-craft {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-video-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.hero-video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.4) 100%);
+  z-index: 1;
+}
+
+/* Top Navigation Bar */
+.craft-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: transparent;
+  z-index: 100;
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.craft-navbar.craft-navbar-scrolled {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.72) 100%);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.08);
+}
+
+.craft-navbar.craft-navbar-scrolled .craft-logo {
+  color: #0f172a;
+}
+
+.craft-navbar.craft-navbar-scrolled .craft-navbar-links a,
+.craft-navbar.craft-navbar-scrolled .craft-nav-dropdown-toggle {
+  color: rgba(15, 23, 42, 0.82);
+}
+
+.craft-navbar.craft-navbar-scrolled .craft-navbar-links a:hover,
+.craft-navbar.craft-navbar-scrolled .craft-nav-dropdown:hover .craft-nav-dropdown-toggle {
+  color: #1d4ed8;
+  background: rgba(29, 78, 216, 0.08);
+}
+
+.craft-navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.craft-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.18rem;
+  text-decoration: none;
+  color: white;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.22em;
+  padding-left: 0.04em;
+}
+
+.craft-logo-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6366f1;
+  align-self: flex-end;
+  margin-bottom: 0.28em;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+}
+
+.craft-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.craft-navbar-links a,
+.craft-nav-dropdown-toggle {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  line-height: 1;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.craft-navbar-links a:hover,
+.craft-nav-dropdown:hover .craft-nav-dropdown-toggle {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Generations dropdown */
+.craft-nav-dropdown {
+  position: relative;
+}
+
+.craft-nav-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.craft-nav-caret {
+  font-size: 0.62rem;
+  transition: transform 0.2s ease;
+}
+
+.craft-nav-dropdown:hover .craft-nav-caret {
+  transform: rotate(180deg);
+}
+
+.craft-nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  padding: 0.4rem;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.4);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  z-index: 110;
+}
+
+/* Bridge the gap so the menu doesn't close when moving the cursor down */
+.craft-nav-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 0.6rem;
+}
+
+.craft-nav-dropdown:hover .craft-nav-dropdown-menu,
+.craft-nav-dropdown:focus-within .craft-nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.craft-nav-dropdown-menu a {
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.55rem 0.85rem;
+  border-radius: 9px;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.craft-nav-dropdown-menu a:hover {
+  color: #ffffff;
+  background: rgba(99, 102, 241, 0.28);
+}
+
+/* Hero Body Content */
+.hero-craft-body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem 4rem;
+}
+
+.hero-craft-content {
+  max-width: 1100px;
+  text-align: center;
+}
+
+.craft-title {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 3.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.15;
+  text-align: center;
+  /* Solid white + layered dark halo so it stays crisp/bright over light parts of the video */
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.55),
+    0 4px 22px rgba(0, 0, 0, 0.5);
+  margin: 0 0 0.5rem;
+}
+
+/* Force solid white even where the gradient-clip override was applied */
+.craft-title-gradient,
+.craft-title.craft-title-gradient {
+  color: #ffffff;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.craft-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.craft-title .craft-title-accent {
+  color: #2563eb;
+  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 52%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  text-shadow: none;
+  filter: none;
+}
+
+.craft-zero-shot-badge {
+  display: inline-block;
+  margin: 0.75rem 0 1rem;
+  padding: 0.45rem 1.1rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.craft-zero-shot-badge strong {
+  color: #0d9488;
+}
+
+/* Action Buttons */
+.craft-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.craft-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.craft-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.craft-btn-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.craft-btn .fa,
+.craft-btn .fab {
+  width: auto;
+  height: auto;
+  font-size: 1.1rem;
+}
+
+.craft-btn-arxiv {
+  background: rgba(20, 20, 22, 0.92);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.craft-btn-paper {
+  background: #3b82f6;
+  color: white;
+}
+
+.craft-btn-video,
+.craft-btn-code {
+  background: rgba(20, 20, 22, 0.92);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.craft-btn-disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.craft-btn-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Scroll Indicator */
+.craft-scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  opacity: 0.9;
+  animation: scroll-bounce 2s ease-in-out infinite;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.craft-scroll-indicator:hover {
+  color: white;
+  opacity: 1;
+}
+
+.craft-scroll-indicator i {
+  font-size: 0.6rem;
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+@media (max-width: 1024px) {
+  .craft-title {
+    font-size: 2.25rem;
+  }
+  .craft-navbar-links {
+    gap: 1rem;
+  }
+  .craft-navbar-links a {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Full link row is unusable on small phones; hero still works without top chrome. */
+  .craft-navbar {
+    display: none !important;
+  }
+  .craft-title {
+    font-size: clamp(0.95rem, 4.1vw, 1.7rem);
+  }
+  .craft-buttons {
+    flex-direction: column;
+  }
+  .craft-btn {
+    justify-content: center;
+  }
+}
+
+/* ===== Method carousel (below hero) ===== */
+.craft-method-carousel-section {
+  padding: 3.5rem 0 2.25rem;
+  background: radial-gradient(1200px 600px at 50% 0%, rgba(74, 158, 255, 0.18), rgba(15, 23, 42, 0.98)), #0b1220;
+  overflow: hidden;
+}
+
+.craft-method-carousel-header {
+  max-width: 1600px;
+  margin: 0 auto 1.25rem;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+/* Key Contributions header readability on dark background */
+.craft-method-carousel-section .craft-subsection-title {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+.craft-method-carousel-section .craft-subsection-title::after {
+  background: #4a9eff;
+}
+
+.craft-method-carousel-section .craft-contributions {
+  margin-bottom: 0;
+}
+
+.craft-section-title.craft-section-title-invert {
+  color: #f8fafc;
+}
+
+.craft-section-title.craft-section-title-invert::after {
+  background: #4a9eff;
+}
+
+.craft-augmentation-desc.craft-augmentation-desc-invert {
+  color: rgba(226, 232, 240, 0.86);
+}
+
+.craft-carousel-cta {
+  margin-top: 0.75rem;
+}
+
+.craft-carousel {
+  width: 100%;
+  position: relative;
+}
+
+.craft-carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.craft-carousel-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 1.5rem 1.25rem;
+  max-width: 1600px;
+  display: grid;
+  gap: 1rem;
+}
+
+.craft-carousel-row {
+  display: flex;
+  gap: 1rem;
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+.craft-carousel-row-top {
+  --craft-card-w: clamp(320px, 28vw, 520px);
+}
+
+.craft-carousel-row-bottom {
+  --craft-card-w: clamp(240px, 20vw, 380px);
+}
+
+.craft-carousel-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  aspect-ratio: 16 / 9;
+  min-width: 0;
+  flex: 0 0 var(--craft-card-w);
+}
+
+.craft-carousel-card video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  background: #0b1220;
+}
+
+.craft-carousel-label {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.72);
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  backdrop-filter: blur(10px);
+}
+
+.craft-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 1.5rem 2.25rem;
+}
+
+.craft-carousel-playpause {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.5);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.craft-carousel-playpause:hover {
+  transform: translateY(-1px);
+  border-color: rgba(74, 158, 255, 0.55);
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.craft-carousel-playpause:active {
+  transform: translateY(0);
+}
+
+.craft-carousel-playpause i {
+  font-size: 0.95rem;
+}
+
+.craft-carousel-playpause-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.craft-carousel-dots {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.craft-carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(226, 232, 240, 0.25);
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.craft-carousel-dot.is-active {
+  width: 30px;
+  background: #4a9eff;
+  border-color: #4a9eff;
+}
+
+@media (max-width: 640px) {
+  .craft-carousel-controls {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .craft-carousel-row {
+    scroll-behavior: auto;
+  }
+}
+
+/* ===== Method flow diagram (Method section) ===== */
+.craft-method-flow {
+  --flow-c1: #22c55e;
+  --flow-c2: #06b6d4;
+  --flow-c3: #a855f7;
+  --flow-c4: #f97316;
+  position: relative;
+  margin: 2.25rem auto 0;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.75rem;
+  text-align: center;
+}
+
+.craft-method-flow-line {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 34px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--flow-c1), var(--flow-c2), var(--flow-c3), var(--flow-c4));
+  opacity: 0.55;
+}
+
+.craft-method-flow-step {
+  position: relative;
+  z-index: 1;
+}
+
+.craft-method-flow-badge {
+  width: 68px;
+  height: 68px;
+  border-radius: 999px;
+  margin: 0 auto 0.85rem;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #0b1220;
+  box-shadow: 0 12px 26px rgba(2, 6, 23, 0.18);
+  border: 4px solid rgba(255, 255, 255, 0.92);
+}
+
+.craft-method-flow-badge-1 { background: linear-gradient(135deg, rgba(34,197,94,1), rgba(134,239,172,1)); }
+.craft-method-flow-badge-2 { background: linear-gradient(135deg, rgba(6,182,212,1), rgba(165,243,252,1)); }
+.craft-method-flow-badge-3 { background: linear-gradient(135deg, rgba(168,85,247,1), rgba(233,213,255,1)); }
+.craft-method-flow-badge-4 { background: linear-gradient(135deg, rgba(249,115,22,1), rgba(254,215,170,1)); }
+
+.craft-method-flow-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #0f172a;
+  margin-bottom: 0.4rem;
+}
+
+.craft-method-flow-desc {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #475569;
+}
+
+@media (max-width: 1024px) {
+  .craft-method-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .craft-method-flow-line {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .craft-method-flow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== TL;DR / Overview card ===== */
+.craft-tldr-container {
+  margin: 2.25rem auto 0.5rem;
+  padding: 0 1.5rem;
+}
+
+.craft-tldr-card {
+  max-width: 880px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9ff 100%);
+  border: 1px solid #e6ecf6;
+  border-radius: 18px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Accent strip along the top of the card */
+.craft-tldr-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6366f1 0%, #2d7dd2 100%);
+}
+
+.craft-tldr-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  background: linear-gradient(90deg, #6366f1 0%, #2d7dd2 100%);
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  box-shadow: 0 5px 14px rgba(79, 70, 229, 0.25);
+}
+
+.craft-tldr-lead {
+  margin: 0.9rem 0 0;
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.craft-tldr-lead strong {
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.craft-tldr-points {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.craft-tldr-point {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.craft-tldr-point-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.92rem;
+  color: #ffffff;
+}
+
+.craft-tldr-point-icon-problem { background: linear-gradient(135deg, #fb7185, #ef4444); }
+.craft-tldr-point-icon-idea    { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+
+.craft-tldr-point h4 {
+  margin: 0.05rem 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #334155;
+}
+
+.craft-tldr-point p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #475569;
+}
+
+@media (max-width: 768px) {
+  .craft-tldr-card {
+    padding: 1.5rem 1.4rem;
+  }
+  .craft-tldr-lead {
+    font-size: 1.04rem;
+  }
+  .craft-tldr-points {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+}
+
+/* ===== CRAFT Content Sections ===== */
+.craft-section {
+  padding: 2.5rem 1.5rem;
+}
+
+.craft-section-alt {
+  background: radial-gradient(1000px 420px at 50% 0%, rgba(59, 130, 246, 0.09), rgba(255, 255, 255, 0) 65%),
+              linear-gradient(180deg, #fbfcff 0%, #f1f5ff 55%, #f8fbff 100%);
+}
+
+.craft-section-title {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1a1a1a;
+}
+
+@supports (-webkit-background-clip: text) {
+  .craft-section-title:not(.craft-section-title-invert) {
+    background: linear-gradient(90deg, #0f172a 0%, #1d4ed8 60%, #0f172a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.craft-section-title::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 4px;
+  background: linear-gradient(90deg, #6366f1 0%, #2d7dd2 100%);
+  margin: 0.6rem auto 0;
+  border-radius: 2px;
+}
+
+/* Consistent vertical rhythm when a section has multiple H2 titles */
+.container h2.craft-section-title:not(:first-of-type) {
+  margin-top: 3.25rem;
+}
+
+.craft-task-boxes {
+  margin-bottom: 3rem;
+}
+
+.craft-subsection-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 2.5rem 0 1.5rem;
+  color: #333;
+}
+
+.craft-subsection-title::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: #2d7dd2;
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
+.craft-acronym {
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Info Box */
+.craft-zero-shot-callout {
+  text-align: center;
+  margin: 0 auto 1.25rem;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 2px solid #0d9488;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 700px;
+}
+
+.craft-zero-shot-callout strong {
+  color: #0d9488;
+}
+
+.craft-info-box {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-left: 4px solid #2d7dd2;
+}
+
+.craft-abstract-text {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+.craft-abstract-text:last-child {
+  margin-bottom: 0;
+}
+
+/* Contribution Cards */
+.craft-contributions {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, auto);
+  gap: 1rem;
+  margin: 0 auto 1.75rem;
+  max-width: 1100px;
+}
+
+.craft-contribution-card {
+  background: #eff6ff;
+  border-radius: 20px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.08);
+  border-left: 4px solid #2d7dd2;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.craft-contribution-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15,23,42,0.12);
+}
+
+.craft-contribution-icon {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #2d7dd2, #4a9eff);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1rem;
+  margin-right: 0.6rem;
+  margin-bottom: 0.2rem;
+  vertical-align: middle;
+}
+
+.craft-contribution-card h4 {
+  display: inline-block;
+  font-size: 1.02rem;
+  margin-bottom: 0.25rem;
+  color: #1a1a1a;
+}
+
+.craft-contribution-card p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #1f2933;
+}
+
+/* Stat Cards */
+.craft-stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .craft-stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.craft-stat-card {
+  background: linear-gradient(135deg, #2d7dd2, #4a9eff);
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.craft-stat-num {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.craft-stat-label {
+  font-size: 0.85rem;
+  opacity: 0.95;
+}
+
+/* ===== Why Stereo / point-cloud comparison ===== */
+.craft-stereo-section {
+  position: relative;
+  overflow: hidden;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background:
+    radial-gradient(700px 340px at 8% 12%, rgba(59, 130, 246, 0.12), transparent 72%),
+    radial-gradient(620px 360px at 96% 90%, rgba(139, 92, 246, 0.1), transparent 70%),
+    #f8fbff;
+}
+
+.craft-stereo-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+}
+
+.craft-stereo-section .container {
+  position: relative;
+}
+
+.craft-stereo-heading {
+  max-width: 840px;
+  margin: 0 auto 1.6rem;
+  text-align: center;
+}
+
+.craft-stereo-heading .craft-section-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(2.55rem, 5.2vw, 4.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+.craft-stereo-heading .craft-section-title::after,
+.craft-data-gap-heading .craft-section-title::after {
+  display: none;
+}
+
+.craft-stereo-intro {
+  margin: 0;
+  color: #475569;
+  font-size: 1.08rem;
+  line-height: 1.65;
+}
+
+.craft-stereo-benefits {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem;
+  max-width: 1020px;
+  margin: 0 auto 2.25rem;
+}
+
+.craft-stereo-benefit {
+  position: relative;
+  display: flex;
+  gap: 1.15rem;
+  align-items: center;
+  min-height: 122px;
+  padding: 1.55rem 1.6rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.craft-stereo-benefit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb, #6366f1);
+}
+
+.craft-stereo-benefit:nth-child(2) {
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+.craft-stereo-benefit:nth-child(2)::before,
+.craft-stereo-benefit:nth-child(2) .craft-stereo-benefit-number {
+  background: linear-gradient(135deg, #0891b2, #3b82f6);
+}
+
+.craft-stereo-benefit-number {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  border-radius: 50%;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.24);
+}
+
+.craft-stereo-benefit h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.05rem, 1.7vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.craft-stereo-benefit p {
+  margin: 0;
+  color: #526174;
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
+.craft-pointcloud-comparison {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.35rem;
+  color: #e2e8f0;
+  background:
+    radial-gradient(700px 340px at 84% -5%, rgba(59, 130, 246, 0.18), transparent 62%),
+    linear-gradient(145deg, #0a1020, #101a31 58%, #11182c);
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  border-radius: 24px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
+}
+
+.craft-pointcloud-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.35rem 0.35rem 1.2rem;
+}
+
+.craft-pointcloud-kicker {
+  color: #7dd3fc;
+}
+
+.craft-pointcloud-heading h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+
+.craft-pointcloud-heading p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.craft-pointcloud-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  padding: 0.55rem 0.8rem;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.craft-pointcloud-reset:hover,
+.craft-pointcloud-reset:focus-visible {
+  color: #ffffff;
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(96, 165, 250, 0.5);
+  outline: none;
+}
+
+.craft-pointcloud-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.craft-pointcloud-card {
+  overflow: hidden;
+  background: rgba(5, 10, 22, 0.82);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 17px;
+}
+
+.craft-pointcloud-card-stereo {
+  border-color: rgba(56, 189, 248, 0.28);
+}
+
+.craft-pointcloud-label {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 70px;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.craft-pointcloud-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.04);
+}
+
+.craft-pointcloud-dot-baseline {
+  background: #fbbf24;
+}
+
+.craft-pointcloud-dot-stereo {
+  background: #38bdf8;
+}
+
+.craft-pointcloud-label h4 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.craft-pointcloud-label p {
+  margin: 0.12rem 0 0;
+  color: #7f8da3;
+  font-size: 0.76rem;
+}
+
+.craft-pointcloud-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  min-height: 280px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(29, 78, 216, 0.12), transparent 58%),
+    #050914;
+}
+
+.craft-pointcloud-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+  outline: none;
+  touch-action: auto;
+}
+
+.craft-pointcloud-stage.is-interactive .craft-pointcloud-canvas {
+  cursor: grab;
+  touch-action: none;
+  box-shadow: inset 0 0 0 2px rgba(56, 189, 248, 0.8);
+}
+
+.craft-pointcloud-stage.is-interactive .craft-pointcloud-canvas:active {
+  cursor: grabbing;
+}
+
+.craft-pointcloud-canvas:focus-visible {
+  box-shadow: inset 0 0 0 2px #38bdf8;
+}
+
+.craft-pointcloud-activate {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  padding: 0 0 1.1rem;
+  color: #e0f2fe;
+  background: rgba(2, 6, 23, 0.08);
+  border: 0;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: background 0.2s ease, opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.craft-pointcloud-stage.is-loaded:not(.is-interactive) .craft-pointcloud-activate {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.craft-pointcloud-activate:hover,
+.craft-pointcloud-activate:focus-visible {
+  background: rgba(2, 6, 23, 0.24);
+  outline: none;
+}
+
+.craft-pointcloud-activate span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.62rem 0.9rem;
+  background: rgba(2, 6, 23, 0.82);
+  border: 1px solid rgba(125, 211, 252, 0.5);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.32);
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+}
+
+.craft-pointcloud-status {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.5rem;
+  color: #94a3b8;
+  background: rgba(5, 9, 20, 0.88);
+  font-size: 0.82rem;
+  text-align: center;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.craft-pointcloud-stage.is-loaded .craft-pointcloud-status {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.craft-pointcloud-stage.is-error .craft-pointcloud-status {
+  color: #fecaca;
+}
+
+.craft-pointcloud-stage.is-error .craft-pointcloud-spinner {
+  display: none;
+}
+
+.craft-pointcloud-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(148, 163, 184, 0.25);
+  border-top-color: #38bdf8;
+  border-radius: 50%;
+  animation: craft-pointcloud-spin 0.85s linear infinite;
+}
+
+@keyframes craft-pointcloud-spin {
+  to { transform: rotate(360deg); }
+}
+
+.craft-pointcloud-hint {
+  display: flex;
+  justify-content: center;
+  gap: 1.35rem;
+  padding: 0.9rem 0 0.05rem;
+  color: #728096;
+  font-size: 0.74rem;
+}
+
+.craft-pointcloud-hint span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.craft-pointcloud-noscript {
+  margin: 0.8rem 0 0;
+  color: #fecaca;
+  text-align: center;
+}
+
+/* ===== Stereo data landscape ===== */
+.craft-data-gap-section {
+  position: relative;
+  overflow: hidden;
+  padding-top: 5.5rem;
+  padding-bottom: 5.5rem;
+  background: #ffffff;
+}
+
+.craft-data-gap-section::before {
+  content: '';
+  position: absolute;
+  top: -180px;
+  left: 50%;
+  width: 760px;
+  height: 420px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.09), transparent 68%);
+  transform: translateX(-50%);
+}
+
+.craft-data-gap-section .container {
+  position: relative;
+}
+
+.craft-data-gap-heading {
+  max-width: 850px;
+  margin: 0 auto 2.4rem;
+  text-align: center;
+}
+
+.craft-data-gap-heading .craft-section-title {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(2.25rem, 4.5vw, 3.8rem);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+
+.craft-data-landscape {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
+  align-items: stretch;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.craft-data-state {
+  min-width: 0;
+  padding: 2rem;
+  border-radius: 24px;
+}
+
+.craft-data-state-mono {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.craft-data-state-stereo {
+  color: #ffffff;
+  background:
+    radial-gradient(440px 210px at 85% 0%, rgba(34, 211, 238, 0.2), transparent 70%),
+    linear-gradient(145deg, #172554, #1e40af 54%, #3730a3);
+  box-shadow: 0 24px 54px rgba(30, 64, 175, 0.2);
+}
+
+.craft-data-state-label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.45rem;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.craft-data-state-label > span {
+  width: 7px;
+  height: 7px;
+  background: #94a3b8;
+  border-radius: 50%;
+}
+
+.craft-data-state-stereo .craft-data-state-label {
+  color: #bfdbfe;
+}
+
+.craft-data-state-stereo .craft-data-state-label > span {
+  background: #67e8f9;
+  box-shadow: 0 0 0 5px rgba(103, 232, 249, 0.1);
+}
+
+.craft-dataset-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  height: 190px;
+}
+
+.craft-dataset-gallery figure {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  background: #dbe3ee;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.craft-dataset-gallery video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.craft-dataset-gallery figure::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 48%;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(2, 6, 23, 0.72));
+}
+
+.craft-dataset-gallery figcaption {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.48rem;
+  left: 0.6rem;
+  z-index: 1;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.craft-stereoengine-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  align-items: center;
+  height: 190px;
+}
+
+.craft-stereoengine-gallery figure {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(191, 219, 254, 0.32);
+  border-radius: 12px;
+  box-shadow: inset 0 0 32px rgba(56, 189, 248, 0.08);
+}
+
+.craft-stereoengine-gallery video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.craft-stereoengine-gallery figure::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 42%;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(2, 6, 23, 0.64));
+}
+
+.craft-stereoengine-gallery figcaption {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.55rem;
+  left: 0.65rem;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.craft-data-state-copy {
+  margin-top: 1.35rem;
+}
+
+.craft-data-state-copy h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.35rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.craft-data-state-stereo .craft-data-state-copy h3 {
+  color: #ffffff;
+}
+
+.craft-data-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.35rem;
+}
+
+.craft-data-tags > span,
+.craft-data-tags > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.42rem 0.65rem;
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.craft-data-tags-stereo > span,
+.craft-data-tags-stereo > a {
+  color: #eff6ff;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(191, 219, 254, 0.24);
+}
+
+.craft-data-tags-stereo > a {
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.craft-data-tags-stereo > a:hover,
+.craft-data-tags-stereo > a:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(191, 219, 254, 0.5);
+  outline: none;
+}
+
+.craft-data-shift {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+.craft-data-shift span {
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(transparent, #cbd5e1);
+}
+
+.craft-data-shift span:last-child {
+  background: linear-gradient(#cbd5e1, transparent);
+}
+
+.craft-data-shift i {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0.55rem 0;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 50%;
+  font-size: 0.76rem;
+}
+
+/* ===== Stereo scaling challenge ===== */
+.craft-stereo-scale-callout {
+  position: relative;
+  overflow: hidden;
+  padding: 4.75rem 1.5rem;
+  color: #ffffff;
+  background:
+    radial-gradient(560px 240px at 14% 10%, rgba(56, 189, 248, 0.2), transparent 72%),
+    radial-gradient(520px 220px at 92% 100%, rgba(99, 102, 241, 0.22), transparent 70%),
+    linear-gradient(125deg, #081225, #111f3d 54%, #172554);
+}
+
+.craft-stereo-scale-callout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(90deg, transparent 49.9%, rgba(148, 163, 184, 0.08) 50%, transparent 50.1%);
+}
+
+.craft-stereo-scale-callout .container {
+  position: relative;
+}
+
+.craft-stereo-scale-callout h2 {
+  max-width: 1080px;
+  margin: 0 auto;
+  color: #f8fafc;
+  font-family: 'Google Sans', sans-serif;
+  font-size: clamp(2.1rem, 4vw, 3.65rem);
+  font-weight: 650;
+  line-height: 1.13;
+  letter-spacing: -0.038em;
+  text-align: center;
+}
+
+.craft-stereo-scale-callout h2 span {
+  color: #7dd3fc;
+}
+
+/* ===== StereoEngine-L pipeline ===== */
+.craft-stereoengine-l-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 4.25rem 1.25rem 4.75rem;
+  background: #060b16;
+}
+
+.craft-stereoengine-l-section::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    radial-gradient(760px 360px at 50% -8%, rgba(37, 99, 235, 0.16), transparent 72%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.34), rgba(2, 6, 23, 0.5));
+  pointer-events: none;
+}
+
+.craft-stereoengine-l-section::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 180px;
+  background: linear-gradient(180deg, transparent, #08111f 94%);
+  pointer-events: none;
+}
+
+.craft-stereoengine-l-background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  opacity: 0.9;
+  filter: saturate(0.92) contrast(1.04) brightness(0.82);
+  pointer-events: none;
+}
+
+.craft-stereoengine-l-container {
+  position: relative;
+  z-index: 2;
+  width: min(1480px, 100%);
+  margin: 0 auto;
+}
+
+.craft-stereoengine-l-heading {
+  max-width: 1120px;
+  margin: 0 auto 2.1rem;
+  text-align: center;
+}
+
+.craft-stereoengine-l-heading h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-family: 'Google Sans', sans-serif;
+  font-size: clamp(2.15rem, 3.5vw, 3.4rem);
+  font-weight: 520;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.craft-stereoengine-l-heading strong {
+  color: #60a5fa;
+  font-weight: 760;
+}
+
+.craft-stereoengine-l-heading .craft-l-with-accent {
+  color: #4ade80;
+}
+
+.craft-l-pipeline {
+  display: grid;
+  grid-template-columns: minmax(330px, 1.05fr) 46px minmax(520px, 1.65fr) 46px minmax(270px, 0.85fr);
+  align-items: stretch;
+  width: 100%;
+}
+
+.craft-l-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 390px;
+  padding: 1.5rem 1.35rem;
+  background: rgba(226, 237, 250, 0.93);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 28px;
+  box-shadow: 0 18px 48px rgba(30, 64, 175, 0.07);
+}
+
+.craft-l-stage-generation {
+  background: rgba(214, 229, 247, 0.95);
+}
+
+.craft-l-stage-output {
+  justify-content: center;
+  background: rgba(205, 224, 245, 0.96);
+}
+
+.craft-l-step-number {
+  position: absolute;
+  right: 1.15rem;
+  bottom: 0.8rem;
+  color: rgba(15, 23, 42, 0.82);
+  font-family: 'Google Sans', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.craft-l-stage-one-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px 120px;
+  align-items: center;
+  width: 100%;
+}
+
+.craft-l-media-card {
+  min-width: 0;
+  text-align: center;
+}
+
+.craft-l-video-slot {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(14, 165, 233, 0.05)),
+    #0b1324;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.13);
+}
+
+.craft-l-video-slot video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.craft-l-video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #93c5fd;
+  background:
+    linear-gradient(rgba(148, 163, 184, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.055) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+.craft-l-video-placeholder span {
+  padding: 0.45rem 0.7rem;
+  color: #dbeafe;
+  background: rgba(37, 99, 235, 0.16);
+  border: 1px solid rgba(147, 197, 253, 0.24);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.craft-l-video-slot:has(source[src]) .craft-l-video-placeholder,
+.craft-l-video-slot:has(video[src]) .craft-l-video-placeholder {
+  display: none;
+}
+
+.craft-l-video-slot-mask {
+  background: #030712;
+}
+
+.craft-l-video-slot-mask .craft-l-video-placeholder {
+  color: #cbd5e1;
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 8px, transparent 8px 16px),
+    #050914;
+}
+
+.craft-l-media-card > p {
+  margin: 0.7rem 0 0;
+  color: #1e293b;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.craft-l-inner-arrow,
+.craft-l-stage-bridge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.craft-l-inner-arrow span,
+.craft-l-stage-bridge span {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: #2f6297;
+}
+
+.craft-l-inner-arrow span::after,
+.craft-l-stage-bridge span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 10px solid #2f6297;
+  transform: translateY(-50%);
+}
+
+.craft-l-stage-bridge {
+  padding: 0 0.2rem;
+}
+
+.craft-l-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: linear-gradient(150deg, #397db3, #4f8fc2);
+  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.17);
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 760;
+  line-height: 1.12;
+  text-align: center;
+}
+
+.craft-l-warp-module {
+  height: 190px;
+  padding: 1rem;
+  border-radius: 24px;
+  font-size: 1.2rem;
+}
+
+.craft-l-generation-grid {
+  display: grid;
+  grid-template-columns: minmax(210px, 1fr) minmax(92px, 0.5fr) 34px 132px;
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  gap: 0.15rem 0.55rem;
+  width: 100%;
+}
+
+.craft-l-warped-input {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.craft-l-masked-input {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.craft-l-media-card-small > p {
+  margin-top: 0.55rem;
+  font-size: 1rem;
+  font-weight: 760;
+}
+
+.craft-l-language-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 50px;
+  padding: 0.45rem 0.4rem;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.58);
+  border: 2px solid #2563eb;
+  border-radius: 10px;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.craft-l-generation-route {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.craft-l-route-warped {
+  grid-column: 2 / 4;
+  grid-row: 1;
+}
+
+.craft-l-route-language {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.craft-l-route-masked {
+  grid-column: 2 / 4;
+  grid-row: 3;
+}
+
+.craft-l-generation-route span {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: #2f6297;
+}
+
+.craft-l-generation-route span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid #2f6297;
+  transform: translateY(-50%);
+}
+
+.craft-l-diffusion-module {
+  grid-column: 4;
+  grid-row: 1 / 4;
+  height: 100%;
+  min-height: 270px;
+  padding: 1.2rem 0.8rem 1.2rem 1.4rem;
+  clip-path: polygon(0 0, 100% 13%, 100% 87%, 0 100%, 18% 50%);
+  font-size: 1.25rem;
+}
+
+.craft-l-stage-output .craft-l-media-card {
+  width: 100%;
+}
+
+.craft-l-explainer {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.25rem;
+  margin: 2.4rem auto 0;
+  padding: 0 1.5rem;
+}
+
+.craft-l-explainer-line {
+  position: absolute;
+  top: 29px;
+  right: 8%;
+  left: 8%;
+  height: 3px;
+  background: linear-gradient(90deg, #60a5fa 0%, #2563eb 52%, #102a52 100%);
+  border-radius: 999px;
+}
+
+.craft-l-explainer-step {
+  position: relative;
+  min-width: 0;
+  color: #172033;
+  text-align: center;
+}
+
+.craft-l-explainer-badge {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 0.8rem;
+  color: #ffffff;
+  background: #3b82f6;
+  border: 6px solid #f8fbff;
+  border-radius: 50%;
+  box-shadow: 0 9px 24px rgba(37, 99, 235, 0.2);
+  font-family: 'Google Sans', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 780;
+}
+
+.craft-l-explainer-step-2 .craft-l-explainer-badge {
+  background: #2563eb;
+  box-shadow: 0 9px 24px rgba(30, 64, 175, 0.22);
+}
+
+.craft-l-explainer-step-3 .craft-l-explainer-badge {
+  background: #102a52;
+  box-shadow: 0 9px 24px rgba(15, 42, 82, 0.24);
+}
+
+.craft-l-explainer-copy h3 {
+  margin: 0 0 0.55rem;
+  color: #f8fafc;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 760;
+  line-height: 1.2;
+}
+
+.craft-l-explainer-copy p {
+  max-width: 390px;
+  margin: 0 auto;
+  color: #dbeafe;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.craft-l-prompt-symbol {
+  color: #f8fafc;
+  font-family: Georgia, serif;
+  font-size: 1.08em;
+  font-style: italic;
+}
+
+.craft-l-examples {
+  margin-top: 2.75rem;
+  padding: 1.75rem 1.4rem 1.5rem;
+  background: #f8fbff;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 24px;
+  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.2);
+}
+
+.craft-l-examples h3 {
+  margin: 0 0 1.25rem;
+  color: #0f172a;
+  font-family: 'Google Sans', sans-serif;
+  font-size: clamp(1.45rem, 2.3vw, 2rem);
+  font-weight: 720;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.craft-l-examples-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.craft-l-example-pair {
+  overflow: hidden;
+  padding: 0.65rem;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+.craft-l-example-pair > p {
+  margin: 0 0 0.55rem;
+  color: #475569;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.craft-l-example-views {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.craft-l-example-view {
+  position: relative;
+  overflow: hidden;
+  background: #0b1324;
+  border-radius: 10px;
+}
+
+.craft-l-example-view span {
+  display: block;
+  padding: 0.42rem 0.48rem;
+  color: #ffffff;
+  background: #0f172a;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.craft-l-example-view video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ===== Transition between the two generation settings ===== */
+.craft-method-transition {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  padding: 1.65rem 1.25rem 1.8rem;
+  color: #f8fafc;
+  background: #08111f;
+}
+
+.craft-method-transition::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(920px, 86vw);
+  height: 170px;
+  background: radial-gradient(ellipse, rgba(56, 189, 248, 0.1), transparent 68%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.craft-method-transition-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  align-items: center;
+  gap: 1.35rem;
+  width: min(1040px, 100%);
+  margin: 0 auto;
+}
+
+.craft-method-transition-label {
+  padding: 0.48rem 0.72rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.craft-method-transition-label-l {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.09);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.craft-method-transition-label-s {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.09);
+  border-color: rgba(251, 113, 133, 0.3);
+}
+
+.craft-method-transition-message {
+  display: grid;
+  gap: 0.72rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.craft-method-transition-rail {
+  position: relative;
+  height: 2px;
+  background: linear-gradient(90deg, #4ade80, #38bdf8 52%, #fb7185);
+}
+
+.craft-method-transition-rail::before,
+.craft-method-transition-rail::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.04);
+}
+
+.craft-method-transition-rail::before {
+  left: 0;
+  background: #4ade80;
+}
+
+.craft-method-transition-rail::after {
+  right: 0;
+  background: #fb7185;
+}
+
+.craft-method-transition-rail span {
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid #fb7185;
+  border-right: 2px solid #fb7185;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.craft-method-transition-message p {
+  margin: 0;
+  color: #aebbd0;
+  font-size: clamp(0.98rem, 1.7vw, 1.16rem);
+  line-height: 1.35;
+}
+
+.craft-method-transition-message strong {
+  color: #ffffff;
+  font-weight: 720;
+}
+
+/* ===== StereoEngine-S pipeline ===== */
+.craft-stereoengine-s-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 4.25rem 1.25rem 4.75rem;
+  background: #060b16;
+}
+
+.craft-stereoengine-s-section::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    radial-gradient(760px 360px at 50% -8%, rgba(37, 99, 235, 0.16), transparent 72%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.34), rgba(2, 6, 23, 0.5));
+  pointer-events: none;
+}
+
+.craft-stereoengine-s-section::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 180px;
+  background: linear-gradient(180deg, #08111f 6%, transparent);
+  pointer-events: none;
+}
+
+.craft-stereoengine-s-background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  opacity: 0.9;
+  filter: saturate(0.92) contrast(1.04) brightness(0.82);
+  pointer-events: none;
+}
+
+.craft-stereoengine-s-container {
+  position: relative;
+  z-index: 2;
+  width: min(1480px, 100%);
+  margin: 0 auto;
+}
+
+.craft-stereoengine-s-heading {
+  max-width: 1180px;
+  margin: 0 auto 2.1rem;
+  text-align: center;
+}
+
+.craft-stereoengine-s-heading h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-family: 'Google Sans', sans-serif;
+  font-size: clamp(2.1rem, 3.35vw, 3.3rem);
+  font-weight: 520;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.craft-stereoengine-s-heading strong {
+  color: #60a5fa;
+  font-weight: 760;
+}
+
+.craft-stereoengine-s-heading .craft-s-without-accent {
+  color: #f87171;
+}
+
+.craft-s-pipeline {
+  display: grid;
+  grid-template-columns: minmax(500px, 1.55fr) 38px minmax(330px, 1.05fr) 38px minmax(230px, 0.72fr);
+  align-items: stretch;
+  width: 100%;
+}
+
+.craft-s-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 400px;
+  padding: 1.25rem 1.1rem 3rem;
+  background: rgba(226, 237, 250, 0.93);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 28px;
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.22);
+}
+
+.craft-s-stage-conditioning {
+  background: rgba(214, 229, 247, 0.95);
+}
+
+.craft-s-stage-output {
+  background: rgba(205, 224, 245, 0.96);
+}
+
+.craft-s-preprocess-grid {
+  display: grid;
+  grid-template-columns: minmax(145px, 1fr) 24px 112px 24px minmax(145px, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 0.75rem 0.3rem;
+  width: 100%;
+}
+
+.craft-s-sim-left {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.craft-s-sim-right {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.craft-s-canny-left {
+  grid-column: 5;
+  grid-row: 1;
+}
+
+.craft-s-canny-right {
+  grid-column: 5;
+  grid-row: 2;
+}
+
+.craft-s-media-card > p {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.craft-s-canny-slot {
+  background: #030712;
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+.craft-s-canny-slot .craft-l-video-placeholder {
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0 8px, transparent 8px 16px),
+    #030712;
+}
+
+.craft-s-route {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.craft-s-route-in-left {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.craft-s-route-in-right {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.craft-s-route-out-left {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.craft-s-route-out-right {
+  grid-column: 4;
+  grid-row: 2;
+}
+
+.craft-s-route span {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: #2f6297;
+}
+
+.craft-s-route span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid #2f6297;
+  transform: translateY(-50%);
+}
+
+.craft-s-edge-module {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  width: 100%;
+  height: 100%;
+  min-height: 270px;
+  padding: 0.8rem;
+  border-radius: 24px;
+  font-size: 1.02rem;
+}
+
+.craft-s-conditioning-grid {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) 24px 112px;
+  grid-template-rows: repeat(3, minmax(82px, auto));
+  align-items: center;
+  gap: 0.55rem 0.35rem;
+  width: 100%;
+}
+
+.craft-s-reference-input {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.craft-s-reference-pair {
+  overflow: hidden;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.craft-s-reference-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.craft-s-reference-input > p {
+  margin: 0.4rem 0 0;
+  color: #1e293b;
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.craft-s-route-reference {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.craft-s-edge-input {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.craft-s-route-edges {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.craft-s-language-input {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.craft-s-route-instruction {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.craft-s-condition-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 0.55rem;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid #2563eb;
+  border-radius: 10px;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.craft-s-condition-card i {
+  font-family: Georgia, serif;
+  font-size: 1.08em;
+}
+
+.craft-s-diffusion-module {
+  grid-column: 3;
+  grid-row: 1 / 4;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  padding: 1rem 0.65rem 1rem 1.15rem;
+  clip-path: polygon(0 0, 100% 13%, 100% 87%, 0 100%, 18% 50%);
+  font-size: 1.08rem;
+}
+
+.craft-s-output-stack {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.craft-s-explainer {
+  margin-top: 2.4rem;
+}
+
+/* ===== Successful real-world rollouts ===== */
+.craft-success-rollouts-section {
+  padding: 4.25rem 1.25rem 4.75rem;
+  background: #f7faff;
+}
+
+.craft-success-rollouts-container {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.craft-success-rollouts-heading {
+  margin: 0 0 2rem;
+  text-align: center;
+}
+
+.craft-success-rollouts-heading h2 {
+  margin: 0;
+  color: #0f172a;
+  font-family: 'Google Sans', sans-serif;
+  font-size: clamp(2.15rem, 3.6vw, 3.5rem);
+  font-weight: 720;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.craft-success-rollouts-marquee {
+  overflow: hidden;
+  padding: 0.35rem 0 1rem;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+}
+
+.craft-success-rollouts-marquee.is-dragging {
+  cursor: grabbing;
+}
+
+.craft-success-rollouts-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: craft-rollouts-slide-right 34s linear infinite;
+}
+
+.craft-success-rollouts-marquee.is-drag-ready .craft-success-rollouts-track {
+  animation: none;
+}
+
+.craft-success-rollouts-group {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1rem;
+  padding-right: 1rem;
+}
+
+@keyframes craft-rollouts-slide-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.craft-success-rollout-card {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 clamp(250px, 24vw, 360px);
+  width: clamp(250px, 24vw, 360px);
+  background: #0b1324;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.craft-success-rollout-card video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #0b1324;
+}
+
+.craft-success-rollout-card h3 {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  margin: 0;
+  padding: 0.62rem 0.8rem;
+  color: #ffffff;
+  background: rgba(2, 6, 23, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 720;
+  line-height: 1.25;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1100px) {
+  .craft-l-examples-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1180px) {
+  .craft-l-pipeline {
+    grid-template-columns: 1fr;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .craft-s-pipeline {
+    grid-template-columns: 1fr;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .craft-l-stage-bridge {
+    min-height: 52px;
+    padding: 0;
+  }
+  .craft-l-stage-bridge span {
+    width: 2px;
+    height: 40px;
+  }
+  .craft-l-stage-bridge span::after {
+    top: auto;
+    right: 50%;
+    bottom: -1px;
+    border-top: 10px solid #2f6297;
+    border-right: 7px solid transparent;
+    border-bottom: 0;
+    border-left: 7px solid transparent;
+    transform: translateX(50%);
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    scroll-padding-top: 0;
+  }
+  .craft-stereo-section {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+  .craft-stereo-heading {
+    margin-bottom: 1.35rem;
+  }
+  .craft-stereo-heading .craft-section-title {
+    font-size: clamp(2.25rem, 10vw, 3.3rem);
+  }
+  .craft-stereo-benefits,
+  .craft-pointcloud-grid {
+    grid-template-columns: 1fr;
+  }
+  .craft-stereo-benefit {
+    min-height: 0;
+    padding: 1.3rem 1.35rem;
+  }
+  .craft-pointcloud-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .craft-pointcloud-stage {
+    min-height: 240px;
+  }
+  .craft-data-gap-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  .craft-data-gap-heading {
+    margin-bottom: 1.8rem;
+  }
+  .craft-data-gap-heading .craft-section-title {
+    font-size: clamp(2.15rem, 9vw, 3rem);
+  }
+  .craft-data-landscape {
+    grid-template-columns: 1fr;
+  }
+  .craft-data-shift {
+    flex-direction: row;
+    min-height: 56px;
+  }
+  .craft-data-shift span {
+    width: 44px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #cbd5e1);
+  }
+  .craft-data-shift span:last-child {
+    background: linear-gradient(90deg, #cbd5e1, transparent);
+  }
+  .craft-data-shift i {
+    margin: 0 0.55rem;
+    transform: rotate(90deg);
+  }
+  .craft-stereo-scale-callout {
+    padding: 4rem 1.4rem;
+  }
+  .craft-stereo-scale-callout h2 {
+    font-size: clamp(2rem, 8.5vw, 2.75rem);
+  }
+  .craft-stereoengine-l-section {
+    padding: 2.75rem 0.85rem 3.25rem;
+  }
+  .craft-stereoengine-l-section::after,
+  .craft-stereoengine-s-section::after {
+    height: 130px;
+  }
+  .craft-method-transition {
+    padding: 1.35rem 1rem 1.55rem;
+  }
+  .craft-method-transition-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem 1rem;
+  }
+  .craft-method-transition-label-l {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .craft-method-transition-label-s {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .craft-method-transition-message {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .craft-stereoengine-l-heading {
+    margin-bottom: 1.5rem;
+  }
+  .craft-stereoengine-l-heading h2 {
+    font-size: clamp(1.85rem, 8vw, 2.55rem);
+  }
+  .craft-l-stage {
+    min-height: 0;
+    padding: 1.15rem 0.9rem 3rem;
+    border-radius: 22px;
+  }
+  .craft-l-step-number {
+    right: 1rem;
+    bottom: 0.75rem;
+    font-size: 1.85rem;
+  }
+  .craft-l-stage-bridge {
+    min-height: 40px;
+  }
+  .craft-l-stage-bridge span {
+    height: 30px;
+  }
+  .craft-l-stage-one-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+  .craft-l-inner-arrow {
+    min-height: 28px;
+  }
+  .craft-l-inner-arrow span {
+    width: 2px;
+    height: 22px;
+  }
+  .craft-l-inner-arrow span::after {
+    top: auto;
+    right: 50%;
+    bottom: -1px;
+    border-top: 9px solid #2f6297;
+    border-right: 6px solid transparent;
+    border-bottom: 0;
+    border-left: 6px solid transparent;
+    transform: translateX(50%);
+  }
+  .craft-l-warp-module {
+    width: 100%;
+    height: 88px;
+  }
+  .craft-l-generation-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "warped"
+      "arrow-warped"
+      "language"
+      "arrow-language"
+      "masked"
+      "arrow-masked"
+      "diffusion";
+    gap: 0.4rem;
+  }
+  .craft-l-warped-input {
+    grid-area: warped;
+  }
+  .craft-l-route-warped {
+    grid-area: arrow-warped;
+  }
+  .craft-l-language-card {
+    grid-area: language;
+    min-height: 48px;
+    width: min(230px, 100%);
+    margin: 0 auto;
+  }
+  .craft-l-route-language {
+    grid-area: arrow-language;
+  }
+  .craft-l-masked-input {
+    grid-area: masked;
+  }
+  .craft-l-route-masked {
+    grid-area: arrow-masked;
+  }
+  .craft-l-generation-route {
+    justify-content: center;
+    height: 20px;
+  }
+  .craft-l-generation-route span {
+    width: 2px;
+    height: 16px;
+  }
+  .craft-l-generation-route span::after {
+    top: auto;
+    right: 50%;
+    bottom: -1px;
+    border-top: 8px solid #2f6297;
+    border-right: 5px solid transparent;
+    border-bottom: 0;
+    border-left: 5px solid transparent;
+    transform: translateX(50%);
+  }
+  .craft-l-diffusion-module {
+    grid-area: diffusion;
+    width: 100%;
+    height: 110px;
+    min-height: 0;
+    padding: 1rem;
+    clip-path: none;
+    border-radius: 20px;
+  }
+  .craft-l-explainer {
+    grid-template-columns: 1fr;
+    gap: 1.35rem;
+    margin-top: 2rem;
+    padding: 0 0.35rem;
+  }
+  .craft-l-explainer-line {
+    top: 10px;
+    bottom: 10px;
+    left: 28px;
+    width: 3px;
+    height: auto;
+    background: linear-gradient(180deg, #60a5fa 0%, #2563eb 52%, #102a52 100%);
+  }
+  .craft-l-explainer-step {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 0.85rem;
+    text-align: left;
+  }
+  .craft-l-explainer-badge {
+    width: 56px;
+    height: 56px;
+    margin: 0;
+    border-width: 5px;
+    font-size: 1.2rem;
+  }
+  .craft-l-explainer-copy {
+    padding-top: 0.2rem;
+  }
+  .craft-l-explainer-copy h3 {
+    margin-bottom: 0.35rem;
+    font-size: 1.08rem;
+  }
+  .craft-l-explainer-copy p {
+    max-width: none;
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.48;
+  }
+  .craft-l-examples {
+    margin-top: 2.1rem;
+    padding: 1.35rem 0.75rem 0.8rem;
+    border-radius: 18px;
+  }
+  .craft-l-examples-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+  .craft-stereoengine-s-section {
+    padding: 2.75rem 0.85rem 3.25rem;
+  }
+  .craft-stereoengine-s-heading {
+    margin-bottom: 1.5rem;
+  }
+  .craft-stereoengine-s-heading h2 {
+    font-size: clamp(1.75rem, 7.5vw, 2.5rem);
+  }
+  .craft-s-stage {
+    min-height: 0;
+    padding: 1.15rem 0.9rem 3rem;
+    border-radius: 22px;
+  }
+  .craft-s-preprocess-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    grid-template-areas:
+      "sim-left sim-right"
+      "in-left in-right"
+      "edge edge"
+      "out-left out-right"
+      "canny-left canny-right";
+    gap: 0.55rem;
+  }
+  .craft-s-sim-left {
+    grid-area: sim-left;
+  }
+  .craft-s-sim-right {
+    grid-area: sim-right;
+  }
+  .craft-s-route-in-left {
+    grid-area: in-left;
+  }
+  .craft-s-route-in-right {
+    grid-area: in-right;
+  }
+  .craft-s-edge-module {
+    grid-area: edge;
+    min-height: 0;
+    height: 88px;
+    border-radius: 18px;
+  }
+  .craft-s-route-out-left {
+    grid-area: out-left;
+  }
+  .craft-s-route-out-right {
+    grid-area: out-right;
+  }
+  .craft-s-canny-left {
+    grid-area: canny-left;
+  }
+  .craft-s-canny-right {
+    grid-area: canny-right;
+  }
+  .craft-s-preprocess-grid .craft-s-route,
+  .craft-s-conditioning-grid .craft-s-route {
+    justify-content: center;
+    height: 22px;
+  }
+  .craft-s-preprocess-grid .craft-s-route span,
+  .craft-s-conditioning-grid .craft-s-route span {
+    width: 2px;
+    height: 18px;
+  }
+  .craft-s-preprocess-grid .craft-s-route span::after,
+  .craft-s-conditioning-grid .craft-s-route span::after {
+    top: auto;
+    right: 50%;
+    bottom: -1px;
+    border-top: 8px solid #2f6297;
+    border-right: 5px solid transparent;
+    border-bottom: 0;
+    border-left: 5px solid transparent;
+    transform: translateX(50%);
+  }
+  .craft-s-media-card > p {
+    font-size: 0.72rem;
+  }
+  .craft-s-conditioning-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "references"
+      "route-reference"
+      "edges"
+      "route-edges"
+      "instruction"
+      "route-instruction"
+      "diffusion";
+    gap: 0.45rem;
+  }
+  .craft-s-reference-input {
+    grid-area: references;
+  }
+  .craft-s-route-reference {
+    grid-area: route-reference;
+  }
+  .craft-s-edge-input {
+    grid-area: edges;
+  }
+  .craft-s-route-edges {
+    grid-area: route-edges;
+  }
+  .craft-s-language-input {
+    grid-area: instruction;
+  }
+  .craft-s-route-instruction {
+    grid-area: route-instruction;
+  }
+  .craft-s-condition-card {
+    min-height: 52px;
+  }
+  .craft-s-diffusion-module {
+    grid-area: diffusion;
+    width: 100%;
+    height: 110px;
+    min-height: 0;
+    padding: 1rem;
+    clip-path: none;
+    border-radius: 20px;
+  }
+  .craft-s-output-stack {
+    gap: 0.85rem;
+    width: min(520px, 100%);
+    margin: 0 auto;
+  }
+  .craft-success-rollouts-section {
+    padding: 3.25rem 0.85rem 3.75rem;
+  }
+  .craft-success-rollouts-heading {
+    margin-bottom: 1.5rem;
+  }
+  .craft-success-rollout-card {
+    flex-basis: min(76vw, 300px);
+    width: min(76vw, 300px);
+  }
+}
+
+@media (max-width: 480px) {
+  .craft-success-rollout-card h3 {
+    font-size: 0.92rem;
+  }
+  .craft-pointcloud-comparison {
+    margin-right: -0.55rem;
+    margin-left: -0.55rem;
+    padding: 0.75rem;
+    border-radius: 18px;
+  }
+  .craft-pointcloud-heading {
+    padding: 0.45rem 0.35rem 1rem;
+  }
+  .craft-pointcloud-stage {
+    min-height: 210px;
+  }
+  .craft-pointcloud-hint {
+    gap: 0.8rem;
+  }
+  .craft-data-state {
+    padding: 1.4rem;
+    border-radius: 20px;
+  }
+  .craft-dataset-gallery {
+    gap: 0.35rem;
+    height: 176px;
+  }
+  .craft-stereoengine-gallery {
+    height: 176px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .craft-pointcloud-spinner {
+    animation-duration: 1.8s;
+  }
+  .craft-success-rollouts-marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .craft-success-rollouts-track {
+    animation: none;
+    transform: none;
+  }
+  .craft-success-rollouts-marquee:not(.is-drag-ready) .craft-success-rollouts-group[aria-hidden="true"] {
+    display: none;
+  }
+  .craft-success-rollouts-marquee.is-drag-ready {
+    overflow: hidden;
+  }
+}
+
+/* Method Section */
+.craft-method-figure {
+  margin-bottom: 2rem;
+}
+
+.craft-figure-img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.craft-figure-caption {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+.craft-method-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, auto);
+  gap: 1.5rem;
+}
+
+.craft-method-box {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-top: 3px solid #2d7dd2;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.craft-method-box:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+.craft-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #2d7dd2;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+.craft-method-box h4 {
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+.craft-method-box p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Why Canny Comparison */
+.craft-comparison-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .craft-comparison-box {
+    grid-template-columns: 1fr;
+  }
+}
+
+.craft-comparison-item {
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.craft-comparison-bad {
+  background: #fff5f5;
+  border-left: 4px solid #e53e3e;
+}
+
+.craft-comparison-good {
+  background: #f0fff4;
+  border-left: 4px solid #38a169;
+}
+
+.craft-comparison-item h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.craft-video-demo {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.craft-video-demo h4 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.craft-video-demo video {
+  width: 100%;
+  max-width: 800px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Intro line above language-instruction dropdown */
+.craft-prompt-intro {
+  max-width: 640px;
+  margin: 1.25rem auto 0;
+  font-size: 0.925rem;
+  color: #475569;
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* Language instruction dropdown — clean card style */
+.craft-prompt-dropdown {
+  max-width: 720px;
+  margin: 0.85rem auto 0;
+  text-align: left;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.craft-prompt-dropdown summary {
+  padding: 1rem 1.35rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transition: background 0.2s ease;
+}
+
+.craft-prompt-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.craft-prompt-summary-text {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.craft-prompt-chevron {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition: transform 0.25s ease;
+}
+
+.craft-prompt-dropdown[open] .craft-prompt-chevron {
+  transform: rotate(180deg);
+}
+
+.craft-prompt-dropdown summary:hover {
+  background: #f8fafc;
+}
+
+.craft-prompt-dropdown summary:hover .craft-prompt-summary-text {
+  color: #1e293b;
+}
+
+.craft-prompt-inner {
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.craft-prompt-text {
+  margin: 0;
+  padding: 1.35rem 1.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: #334155;
+  word-break: break-word;
+  max-height: 340px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.craft-prompt-text p {
+  margin: 0 0 0.85em;
+}
+
+.craft-prompt-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Experiment Setup */
+.craft-setup-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.craft-setup-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.craft-setup-card:hover {
+  border-color: #2d7dd2;
+  box-shadow: 0 4px 12px rgba(45, 125, 210, 0.15);
+}
+
+.craft-setup-card i {
+  color: #2d7dd2;
+}
+
+/* New Experiment Setup panel (two-stage cards + mini grid) */
+.craft-setup-panel {
+  max-width: 1100px;
+  margin: 0 auto 0;
+  padding: 1.5rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(248, 250, 252, 0.85) 100%);
+  box-shadow: 0 10px 40px rgba(2, 6, 23, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.craft-setup-stages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.craft-setup-stage {
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1.1rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.craft-setup-stage-gen {
+  background: radial-gradient(800px 220px at 30% 0%, rgba(45, 125, 210, 0.16), rgba(255, 255, 255, 0) 60%),
+              linear-gradient(180deg, rgba(239, 246, 255, 0.9) 0%, rgba(255, 255, 255, 0.65) 100%);
+}
+
+.craft-setup-stage-train {
+  background: radial-gradient(800px 220px at 30% 0%, rgba(16, 185, 129, 0.14), rgba(255, 255, 255, 0) 60%),
+              linear-gradient(180deg, rgba(236, 253, 245, 0.85) 0%, rgba(255, 255, 255, 0.65) 100%);
+}
+
+.craft-setup-stage-top {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  margin-bottom: 0.9rem;
+}
+
+.craft-setup-stage-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: rgba(2, 6, 23, 0.9);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.craft-setup-stage-headings h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.craft-setup-stage-headings p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.craft-setup-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.craft-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(2, 6, 23, 0.82);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.craft-setup-mini {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.craft-setup-mini-title {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.9rem;
+}
+
+.craft-setup-mini-title i {
+  color: #2d7dd2;
+}
+
+.craft-setup-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.craft-setup-mini-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.85) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 14px;
+  padding: 0.9rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.craft-setup-mini-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(45, 125, 210, 0.1);
+  color: #2d7dd2;
+}
+
+.craft-setup-mini-k {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #334155;
+  margin-bottom: 0.15rem;
+}
+
+.craft-setup-mini-v {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+@media (max-width: 1024px) {
+  .craft-setup-stages {
+    grid-template-columns: 1fr;
+  }
+  .craft-setup-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .craft-setup-panel {
+    padding: 1.1rem;
+  }
+  .craft-setup-mini-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Task Cards */
+.craft-task-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.craft-task-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.craft-task-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.craft-task-card strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.craft-task-card p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+}
+
+/* Results Tables */
+.craft-table-wrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.craft-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.craft-results-table th,
+.craft-results-table td {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.craft-results-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #334155;
+}
+
+.craft-results-table .craft-table-subheader th {
+  background: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.craft-results-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.craft-table-highlight {
+  background: #eff6ff !important;
+}
+
+.craft-table-highlight td {
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.craft-table-caption {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.craft-table-compact th,
+.craft-table-compact td {
+  padding: 0.6rem 1rem;
+}
+
+/* BibTeX */
+.craft-bibtex-box {
+  position: relative;
+  background: #0f172a;
+  color: #f1f5f9;
+  border-radius: 14px;
+  padding: 1.65rem 1.75rem;
+  overflow-x: auto;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.18);
+}
+
+.craft-bibtex-copy {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.craft-bibtex-copy:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.craft-bibtex-copy.is-copied {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: rgba(52, 211, 153, 0.6);
+  color: #d1fae5;
+}
+
+.craft-bibtex-copy i {
+  font-size: 0.85rem;
+}
+
+.craft-bibtex-box pre {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: transparent;
+  color: #f1f5f9;
+  white-space: pre;
+}
+
+.craft-bibtex-box code {
+  color: inherit;
+  font-family: inherit;
+}
+
+/* Charts */
+/* Real-World Results: tabbed charts */
+.craft-results-color-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.4rem;
+  margin: 1.1rem auto 0;
+  color: #64748b;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.84rem;
+}
+
+.craft-results-color-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.craft-results-color-key i {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 4px;
+}
+
+.craft-results-key-ours {
+  color: #1d4ed8;
+}
+
+.craft-results-key-ours i {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.craft-results-key-baseline i {
+  width: 2.3rem;
+  background: linear-gradient(90deg, #cbd5e1 0 25%, #fed7aa 25% 50%, #a5f3fc 50% 75%, #fbcfe8 75% 100%);
+  border: 1px solid #cbd5e1;
+}
+
+.craft-results-tabs {
+  max-width: 1100px;
+  margin: 2rem auto 0;
+}
+
+.craft-results-tab-buttons {
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.craft-results-panels {
+  position: relative;
+  min-height: 420px;
+}
+
+.craft-results-panel.craft-chart-container {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.craft-results-panel.craft-chart-container h4 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.chart-wrapper-large {
+  position: relative;
+  height: 380px;
+  width: 100%;
+}
+
+.chart-wrapper-large canvas {
+  display: block;
+}
+
+/* Legacy grid (kept for any other chart usage) */
+.craft-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+.craft-chart-container .chart-wrapper {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+.craft-chart-container canvas {
+  display: block;
+}
+
+/* Video tabs and grid */
+.craft-augmentation-desc {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.craft-video-tabs {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.craft-tab-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.craft-tab-btn {
+  padding: 0.55rem 1.3rem;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  border-radius: 999px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.craft-tab-btn:hover {
+  border-color: #6366f1;
+  color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.craft-tab-btn.is-active {
+  background: linear-gradient(90deg, #6366f1 0%, #2d7dd2 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.28);
+}
+
+.craft-video-grid {
+  min-height: 280px;
+  width: 100%;
+}
+
+/* Generation Beyond Franka: 3 video cards in a row */
+.craft-beyond-franka-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.craft-beyond-franka-grid .craft-video-card {
+  min-width: 0;
+  max-width: 100%;
+  aspect-ratio: unset;
+  display: flex;
+  flex-direction: column;
+}
+
+.craft-beyond-franka-grid .craft-video-card video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background: #111;
+}
+
+.craft-beyond-franka-grid .craft-video-card .craft-video-caption {
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .craft-beyond-franka-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.craft-task-videos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: 1fr;
+  column-gap: 1.5rem;
+  row-gap: 1rem;
+  align-items: stretch;
+  min-height: 280px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Prevent cards from overflowing grid cell (aspect-ratio was making them grow past column width) */
+.craft-task-videos > .craft-video-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Force visible gap between the two videos */
+.craft-task-videos > .craft-video-card:first-child {
+  margin-right: 0.75rem;
+}
+.craft-task-videos > .craft-video-card:last-child {
+  margin-left: 0.75rem;
+}
+.craft-task-videos > .craft-video-card:only-child {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.craft-task-videos:has(.craft-video-single) {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.craft-video-card {
+  background: #f8fafc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  aspect-ratio: 16/9;
+  min-height: 200px;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.craft-video-card:hover {
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+  transform: translateY(-4px);
+}
+
+.craft-video-card video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.craft-video-card span {
+  display: block;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Placeholder tiles (e.g. Camera Views before videos are added) */
+.craft-video-card:has(.craft-video-placeholder) {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: auto;
+  min-height: 0;
+}
+
+.craft-video-placeholder {
+  flex: 1;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0.5rem 0;
+  border-radius: 8px;
+  border: 2px dashed #94a3b8;
+  background: linear-gradient(160deg, #e8eef5 0%, #f1f5f9 100%);
+  color: #64748b;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.craft-video-placeholder span {
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.craft-video-single span {
+  display: none;
+}
+
+/* Wrist + 3rd Person: show full tiled video (no top/bottom crop) */
+#wrist-generation .craft-video-card video {
+  object-fit: contain;
+  background: #111;
+}
+
+/* Camera Views: same single-wide layout as wrist when using one video */
+#camera-views .craft-video-card.craft-video-single video {
+  object-fit: contain;
+  background: #111;
+}
+
+#camera-views .craft-video-card.craft-video-single .craft-video-placeholder {
+  margin: 0.5rem;
+  min-height: min(50vh, 420px);
+  aspect-ratio: 16 / 9;
+}
+
+/* Real-World Rollouts section */
+.craft-rollout-tabs {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.craft-rollout-tabs .craft-tab-buttons {
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.craft-rollout-panel h4 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #334155;
+}
+
+.craft-rollout-videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.craft-rollout-videos .craft-video-card video {
+  background: #f1f5f9;
+}
+
+/* Stress Testing Video Generation Model */
+.craft-stress-tabs {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.craft-stress-tabs .craft-tab-buttons {
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.craft-stress-panel {
+  margin-top: 0.5rem;
+}
+
+.craft-stress-panel .craft-subsection-title {
+  margin-top: 0;
+}
+
+.craft-stress-single-video {
+  max-width: 800px;
+  margin: 1rem auto 0;
+}
+
+.craft-stress-single-video .craft-video-card {
+  width: 100%;
+}
+
+.craft-stress-caption {
+  font-size: 0.75rem !important;
+  color: #64748b !important;
+  padding: 0.4rem 0.75rem !important;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Caption below each video (e.g. Generation Beyond Franka) */
+.craft-video-caption {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
+  color: #475569;
+  text-align: center;
+  line-height: 1.35;
+  font-weight: 500;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+/* Different reference: image + video side by side */
+.craft-reference-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 1rem auto 0;
+  align-items: start;
+}
+
+.craft-reference-item {
+  background: #f8fafc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.craft-reference-item img,
+.craft-reference-item video {
+  width: 100%;
+  display: block;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background: #111;
+}
+
+.craft-reference-item .craft-stress-caption {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .craft-reference-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.craft-rollout-note {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.craft-rollout-note code {
+  background: #f1f5f9;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Augmentation section styling */
+.craft-augmentation-section {
+  padding: 3rem 1.5rem;
+}
+
+.craft-augmentation-section .container.is-max-widescreen {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.container.is-max-desktop {
+  max-width: 1100px;
+}
+
+#object-pose-generation .title,
+#lighting-generation .title,
+#object-color-generation .title,
+#background-generation .title,
+#crossembodiment-generation .title,
+#wrist-generation .title {
+  font-family: 'Google Sans', sans-serif;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+/* baseline comparison layout */
+.box.mt-0.mb-0 {
+  max-width: 65%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+/* constrain paragraphs in centered columns */
+.columns.is-centered > p {
+  max-width: 70%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#baseline-container {
+  margin-top: 1rem;
+}
+.baseline-comparison {
+  margin-bottom: 2rem;
+}
+.baseline-comparison video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.baseline-comparison .title {
+  margin-bottom: 0.5rem;
+}
+
+/* baseline comparison layout */
+.box.mt-0.mb-0 {
+  max-width: 65%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+/* constrain paragraphs in centered columns */
+.columns.is-centered > p {
+  max-width: 70%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#lighting-container {
+  margin-top: 1rem;
+}
+.lighting-comparison {
+  margin-bottom: 2rem;
+}
+.lighting-comparison video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.lighting-comparison .title {
+  margin-bottom: 0.5rem;
+}
+
+/* baseline comparison layout */
+.box.mt-0.mb-0 {
+  max-width: 65%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+/* constrain paragraphs in centered columns */
+.columns.is-centered > p {
+  max-width: 70%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#object-color-container {
+  margin-top: 1rem;
+}
+.object-color-comparison {
+  margin-bottom: 2rem;
+}
+.object-color-comparison video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.object-color-comparison .title {
+  margin-bottom: 0.5rem;
+}
+/* keep old styles below */
+
+#background-container {
+  margin-top: 1rem;
+}
+.background-comparison {
+  margin-bottom: 2rem;
+}
+.background-comparison video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.background-comparison .title {
+  margin-bottom: 0.5rem;
+}
+
+#crossembodiment-container {
+  margin-top: 1rem;
+}
+.crossembodiment-comparison {
+  margin-bottom: 2rem;
+}
+.crossembodiment-comparison video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.crossembodiment-comparison .title {
+  margin-bottom: 0.5rem;
+}
+
+#wrist-container {
+  margin-top: 1rem;
+}
+.wrist-comparison {
+  margin-bottom: 2rem;
+}
+.wrist-comparison video {
+  max-width: 100%;
+  border-radius: 8px;
+}
+.wrist-comparison .title {
+  margin-bottom: 0.5rem;
+}
+/* keep old styles below */
+
+.craft-footer {
+  padding: 3rem 1.5rem 2.25rem;
+  background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.craft-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.craft-footer-brand {
+  text-align: left;
+}
+
+.craft-footer-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.18rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.22em;
+  color: #ffffff;
+}
+
+.craft-footer-logo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366f1;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+}
+
+.craft-footer-title {
+  margin: 0.5rem 0 0.15rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.craft-footer-venue {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.craft-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.craft-footer-links a,
+.craft-footer-link-disabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.craft-footer-links a:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.craft-footer-link-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.craft-footer-link-disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .craft-footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .craft-footer-brand {
+    text-align: center;
+  }
+  .craft-footer-links {
+    justify-content: center;
+  }
+}
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dnerf {
+  font-variant: small-caps;
+}
+
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+
+.publication-banner {
+  max-height: parent;
+
+}
+
+.publication-banner video {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  object-fit: fit;
+}
+
+.publication-title {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-venue {
+    color: #555;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.publication-awards {
+    color: #ff3860;
+    width: fit-content;
+    font-weight: bolder;
+}
+
+.publication-video {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 10px !important;
+}
+
+.publication-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.results-carousel {
+  overflow: hidden;
+}
+
+.results-carousel .item {
+  margin: 5px;
+  overflow: hidden;
+  border: 1px solid #bbb;
+  border-radius: 10px;
+  padding: 0;
+  font-size: 0;
+}
+
+.results-carousel video {
+  margin: 0;
+}
+
+
+.interpolation-panel {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.interpolation-panel .interpolation-image {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.interpolation-panel .slider {
+  margin: 0 !important;
+}
+
+.interpolation-panel .slider {
+  margin: 0 !important;
+}
+
+#interpolation-image-wrapper {
+  width: 100%;
+}
+#interpolation-image-wrapper img {
+  border-radius: 5px;
+}
+
+.section-div {
+  height: 3em;
+}
+
+.mobile-message {
+  display: none;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .mobile-message {
+    display: block;
+  }
+
+  .desktop-content {
+    display: none;
+  }
+}
+
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.dnerf {
+  font-variant: small-caps;
+}
+
+
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+
+.publication-banner {
+  max-height: parent;
+
+}
+
+.publication-banner video {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  object-fit: fit;
+}
+
+.publication-title {
+    font-family: 'Google Sans', sans-serif;
+}
+
+.publication-venue {
+    color: #555;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.publication-awards {
+    color: #ff3860;
+    width: fit-content;
+    font-weight: bolder;
+}
+
+.publication-video {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+
+    overflow: hidden;
+    border-radius: 10px !important;
+}
+
+.publication-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.results-carousel {
+  overflow: hidden;
+}
+
+.results-carousel .item {
+  margin: 5px;
+  overflow: hidden;
+  border: 1px solid #bbb;
+  border-radius: 10px;
+  padding: 0;
+  font-size: 0;
+}
+
+.results-carousel video {
+  margin: 0;
+}
+
+
+.interpolation-panel {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.interpolation-panel .interpolation-image {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.interpolation-panel .slider {
+  margin: 0 !important;
+}
+
+.interpolation-panel .slider {
+  margin: 0 !important;
+}
+
+#interpolation-image-wrapper {
+  width: 100%;
+}
+#interpolation-image-wrapper img {
+  border-radius: 5px;
+}
+
+
+.has-bg-img {
+  background: url('/static/images/toss.jpeg')center center;
+   background-size:cover; }
+
+
+
+.overlay {
+position: absolute;
+top: 0;
+right: 0;
+bottom: 0;
+left: 0;
+background-color: rgba(0, 0, 0, 0.4); /* 40% opacity black */
+z-index: 1; /* Make sure it's behind the text */
+transition: opacity 1.0s;
+}
+
+.hero-body,
+.hero-head,
+.hero-foot {
+  z-index: 2; /* Ensure text is above the overlay */
+  transition: opacity 1.0s;
+}

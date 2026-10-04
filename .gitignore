@@ -1,0 +1,10 @@
+video_change.py
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.py[cod]
+
+# Local paper and source artifacts; do not publish with the public website.
+poster/
+*.pdf
+*.zip
