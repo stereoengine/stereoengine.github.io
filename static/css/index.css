@@ -2279,13 +2279,6 @@ body {
   line-height: 1.55;
 }
 
-.craft-l-prompt-symbol {
-  color: #f8fafc;
-  font-family: Georgia, serif;
-  font-size: 1.08em;
-  font-style: italic;
-}
-
 .craft-l-examples {
   margin-top: 2.75rem;
   padding: 1.75rem 1.4rem 1.5rem;

@@ -40,8 +40,6 @@
   <script src="./static/js/index.js"></script>
   <script src="./static/js/pointcloud-viewer.js" defer></script>
   <script src="./static/js/rollouts-marquee.js" defer></script>
-  <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -535,7 +533,7 @@
         <div class="craft-l-explainer-badge" aria-hidden="true">2</div>
         <div class="craft-l-explainer-copy">
           <h3>Video Diffusion</h3>
-          <p>Fills the masked region from the warped video, mask, and a language prompt <span class="craft-l-prompt-symbol">ℓ</span>.</p>
+          <p>Fills the masked region using the warped video, mask, and language instruction.</p>
         </div>
       </article>
 
@@ -759,7 +757,7 @@
           <div class="craft-s-route craft-s-route-edges" aria-hidden="true"><span></span></div>
 
           <div class="craft-s-condition-card craft-s-language-input">
-            <span>Language Instruction <i>ℓ</i></span>
+            <span>Language Instruction</span>
           </div>
 
           <div class="craft-s-route craft-s-route-instruction" aria-hidden="true"><span></span></div>
@@ -813,7 +811,7 @@
         <div class="craft-l-explainer-badge" aria-hidden="true">2</div>
         <div class="craft-l-explainer-copy">
           <h3>Geometry + Appearance</h3>
-          <p>Pass both edge videos to the model with two reference images and instruction <span class="craft-l-prompt-symbol">ℓ</span>. Edges define geometry; the references supply background, lighting, and surface texture.</p>
+          <p>Pass both edge videos to the model with two reference images and a language instruction. Edges define geometry; the references supply background, lighting, and surface texture.</p>
         </div>
       </article>
 
